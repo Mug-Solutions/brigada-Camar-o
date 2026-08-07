@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brigada Camarão — Protótipo de Sistema</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark"><span class="l1">Brigada</span><span class="l2">Camarão</span></span></div>
+      <div class="brand-sub">Gestão de Bombeiros Civis para Eventos</div>
+      <nav class="nav" id="nav">
+        <button class="nav-item" data-view="painel"><span class="ico">◆</span>Painel</button>
+        <button class="nav-item" data-view="bombeiros"><span class="ico">☰</span>Bombeiros</button>
+        <button class="nav-item" data-view="eventos"><span class="ico">▦</span>Eventos &amp; Escalas</button>
+        <button class="nav-item" data-view="financeiro"><span class="ico">$</span>Financeiro</button>
+      </nav>
+      <div class="nav-foot">
+        <span class="proto-badge">Protótipo · MUG Solutions</span>
+        <p>Dados fictícios para fins de demonstração da proposta.</p>
+      </div>
+    </aside>
+    <main class="main" id="main"></main>
+  </div>
+
+  <div class="backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div>
+        <h2 id="drawerTitle">—</h2>
+        <div class="sub" id="drawerSub"></div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-foot" id="drawerFoot"></div>
+  </aside>
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
