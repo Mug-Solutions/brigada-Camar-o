@@ -96,7 +96,15 @@
   .box.checked::after{ content:""; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid white; border-width:0 2px 2px 0; transform:rotate(45deg); }
   .qbody{ flex:1; min-width:0; }
   .qtext{ font-size:13.5px; color:var(--text); line-height:1.6; }
-  .qnote{ margin-top:9px; height:17px; border-bottom:1px dotted var(--border); }
+  .qnote{
+    display:block; width:100%; margin-top:9px; min-height:32px; padding:7px 10px;
+    border:1px solid var(--border); border-radius:6px; background:var(--light);
+    font-family:'Inter',sans-serif; font-size:12.5px; color:var(--text); line-height:1.5;
+    resize:vertical;
+  }
+  .qnote::placeholder{ color:#a7a3c4; }
+  .qnote:focus{ outline:none; border-color:var(--purple-light); background:var(--white); }
+  .qnote--lg{ min-height:50px; }
 
   /* ── RODAPE ───────────────────────────────────── */
   .site-footer{ background:var(--dark); color:rgba(255,255,255,0.4); display:flex; justify-content:space-between; align-items:center; padding:20px 56px; font-size:11.5px; max-width:900px; margin:40px auto 0; }
@@ -109,6 +117,7 @@
   @media print{
     .print-btn{ display:none; }
     body{ background:white; }
+    .qnote{ border-color:#c8c4e0 !important; background:white !important; }
   }
   @media (max-width:700px){
     .banner-nav, .banner-body, .banner-foot, .page-body, .site-footer{ padding-left:22px; padding-right:22px; }
@@ -194,11 +203,11 @@
       <h2 class="section-title">Contexto e Prioridades</h2>
       <p class="section-why">Vale abrir a call por aqui — o resto das respostas muda de peso dependendo do volume e do prazo.</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantos eventos vocês atendem por mês hoje, em média? E nos meses de pico?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a meta de crescimento para os próximos 12 meses?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma data-alvo para o sistema entrar em uso (início de temporada, evento específico)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se não der para entregar tudo de uma vez, o que dói mais hoje: cadastro/compliance, montar escala, ou controle financeiro?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas pessoas da equipe vão usar o sistema no dia a dia, e em quais funções (operação, financeiro, direção)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantos eventos vocês atendem por mês hoje, em média? E nos meses de pico?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a meta de crescimento para os próximos 12 meses?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma data-alvo para o sistema entrar em uso (início de temporada, evento específico)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se não der para entregar tudo de uma vez, o que dói mais hoje: cadastro/compliance, montar escala, ou controle financeiro?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas pessoas da equipe vão usar o sistema no dia a dia, e em quais funções (operação, financeiro, direção)?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -206,12 +215,12 @@
       <div class="section-eyebrow"><span class="section-num">02</span><span class="section-label">Equipe</span></div>
       <h2 class="section-title">Bombeiros — Cadastro e Compliance</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Além de ASO, E-Social e Credenciamento, existe outro documento obrigatório (curso NR-23, CNH, ficha de EPI, exame toxicológico)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Os bombeiros são intermitentes, CLT ou PJ? Isso muda como calculamos e pagamos cada diária?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quando um documento vence, o que acontece — alguém acompanha manualmente, ou passa despercebido?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um bombeiro com documento vencido pode continuar sendo escalado na prática, ou isso já é proibido hoje?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês registram disponibilidade (dias, horários, regiões) de cada bombeiro, ou a escolha é sempre manual?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existem outras funções/hierarquias além de "Bombeiro Civil" e "Líder" (ex: socorrista, motorista, coordenador)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Além de ASO, E-Social e Credenciamento, existe outro documento obrigatório (curso NR-23, CNH, ficha de EPI, exame toxicológico)?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Os bombeiros são intermitentes, CLT ou PJ? Isso muda como calculamos e pagamos cada diária?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quando um documento vence, o que acontece — alguém acompanha manualmente, ou passa despercebido?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um bombeiro com documento vencido pode continuar sendo escalado na prática, ou isso já é proibido hoje?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês registram disponibilidade (dias, horários, regiões) de cada bombeiro, ou a escolha é sempre manual?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existem outras funções/hierarquias além de "Bombeiro Civil" e "Líder" (ex: socorrista, motorista, coordenador)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -219,9 +228,9 @@
       <div class="section-eyebrow"><span class="section-num">03</span><span class="section-label">Contratantes</span></div>
       <h2 class="section-title">Clientes / Contratantes</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais dados vocês precisam guardar de cada empresa contratante (CNPJ, contato responsável, endereço, forma de pagamento)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Clientes recorrentes (como Arena MRV, Biocor) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o cliente ter algum tipo de acesso para acompanhar a escala do próprio evento, ou isso é só interno?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais dados vocês precisam guardar de cada empresa contratante (CNPJ, contato responsável, endereço, forma de pagamento)?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Clientes recorrentes (como Arena MRV, Biocor) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o cliente ter algum tipo de acesso para acompanhar a escala do próprio evento, ou isso é só interno?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -229,10 +238,10 @@
       <div class="section-eyebrow"><span class="section-num">04</span><span class="section-label">Operação</span></div>
       <h2 class="section-title">Eventos e Contratos</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como chega hoje o pedido de um evento — WhatsApp, e-mail, ligação? Faz sentido um formulário próprio para captar isso?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma etapa de orçamento/proposta antes do contrato fechar, ou o valor já vem definido pelo cliente?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um evento pode ter mais de um turno por dia e mais de um dia — como vocês organizam isso hoje?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O que acontece em caso de cancelamento ou remarcação — existe alguma regra de multa ou reembolso?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como chega hoje o pedido de um evento — WhatsApp, e-mail, ligação? Faz sentido um formulário próprio para captar isso?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma etapa de orçamento/proposta antes do contrato fechar, ou o valor já vem definido pelo cliente?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um evento pode ter mais de um turno por dia e mais de um dia — como vocês organizam isso hoje?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O que acontece em caso de cancelamento ou remarcação — existe alguma regra de multa ou reembolso?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -240,10 +249,10 @@
       <div class="section-eyebrow"><span class="section-num">05</span><span class="section-label">Operação</span></div>
       <h2 class="section-title">Escala e Alocação</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quem monta a escala e com base em quê (proximidade, ordem de chegada, preferência do bombeiro)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é registrado o horário cumprido — papel, aplicativo, alguém liga confirmando?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se um bombeiro escalado falta de última hora, como vocês resolvem hoje? Precisa de uma "lista de reserva" no sistema?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o próprio bombeiro ter acesso pelo celular para ver a escala e confirmar presença?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quem monta a escala e com base em quê (proximidade, ordem de chegada, preferência do bombeiro)?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é registrado o horário cumprido — papel, aplicativo, alguém liga confirmando?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se um bombeiro escalado falta de última hora, como vocês resolvem hoje? Precisa de uma "lista de reserva" no sistema?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o próprio bombeiro ter acesso pelo celular para ver a escala e confirmar presença?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -252,11 +261,11 @@
       <h2 class="section-title">Precificação e Remuneração</h2>
       <p class="section-why">Essa régua define o motor de cálculo do sistema — vale entender a lógica completa, não só os valores que já vimos na planilha.</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a régua de valores por turno hoje (diurno, noturno, e o valor maior que vimos) — como esses valores são definidos?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor pago varia por função (líder ganha mais que bombeiro civil), por cliente, ou por tipo de evento?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe adicional noturno, hora extra, ou DSR (descanso semanal remunerado) a calcular?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor de alimentação é sempre fixo, ou muda conforme o evento/cliente?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é definido o valor cobrado do cliente — margem fixa sobre o custo, tabela por tipo de evento, ou negociação caso a caso?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a régua de valores por turno hoje (diurno, noturno, e o valor maior que vimos) — como esses valores são definidos?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor pago varia por função (líder ganha mais que bombeiro civil), por cliente, ou por tipo de evento?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe adicional noturno, hora extra, ou DSR (descanso semanal remunerado) a calcular?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor de alimentação é sempre fixo, ou muda conforme o evento/cliente?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é definido o valor cobrado do cliente — margem fixa sobre o custo, tabela por tipo de evento, ou negociação caso a caso?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -264,11 +273,11 @@
       <div class="section-eyebrow"><span class="section-num">07</span><span class="section-label">Financeiro</span></div>
       <h2 class="section-title">Financeiro e Faturamento</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O sistema precisa emitir nota fiscal/recibo, ou isso continua em outra ferramenta (contador, ERP)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é feito o pagamento aos bombeiros — PIX individual, transferência em lote, dentro da folha?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês têm problema de inadimplência de clientes? Precisa de algum controle de cobrança automática?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual relatório financeiro é mais importante: lucro por evento, por cliente, ou por período (mês/trimestre)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum sistema contábil ou ERP que precisa "conversar" com esse sistema?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O sistema precisa emitir nota fiscal/recibo, ou isso continua em outra ferramenta (contador, ERP)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é feito o pagamento aos bombeiros — PIX individual, transferência em lote, dentro da folha?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês têm problema de inadimplência de clientes? Precisa de algum controle de cobrança automática?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual relatório financeiro é mais importante: lucro por evento, por cliente, ou por período (mês/trimestre)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum sistema contábil ou ERP que precisa "conversar" com esse sistema?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -276,9 +285,9 @@
       <div class="section-eyebrow"><span class="section-num">08</span><span class="section-label">Logística</span></div>
       <h2 class="section-title">Materiais e Equipamentos</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Extintores, DEA e outros materiais são da empresa ou alugados por evento?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Precisa controlar estoque, manutenção e validade de carga desses equipamentos dentro do sistema?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe checklist de saída e retorno de material por evento?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Extintores, DEA e outros materiais são da empresa ou alugados por evento?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Precisa controlar estoque, manutenção e validade de carga desses equipamentos dentro do sistema?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe checklist de saída e retorno de material por evento?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -286,9 +295,9 @@
       <div class="section-eyebrow"><span class="section-num">09</span><span class="section-label">Sistema</span></div>
       <h2 class="section-title">Usuários, Acessos e Notificações</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Pessoas diferentes devem ver coisas diferentes no sistema (ex: operação não vê o lucro, financeiro não mexe na escala)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês querem alertas automáticos (documento vencendo, escala incompleta, pagamento atrasado)? Por e-mail, WhatsApp, ou dentro do sistema?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido confirmar a escala com o bombeiro automaticamente por WhatsApp?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Pessoas diferentes devem ver coisas diferentes no sistema (ex: operação não vê o lucro, financeiro não mexe na escala)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês querem alertas automáticos (documento vencendo, escala incompleta, pagamento atrasado)? Por e-mail, WhatsApp, ou dentro do sistema?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido confirmar a escala com o bombeiro automaticamente por WhatsApp?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -296,8 +305,8 @@
       <div class="section-eyebrow"><span class="section-num">10</span><span class="section-label">Gestão</span></div>
       <h2 class="section-title">Relatórios e Indicadores</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais números vocês acompanham hoje de verdade (faturamento, lucro, nº de eventos, taxa de ocupação da escala)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Com que frequência esses números são olhados — diário, semanal, mensal?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais números vocês acompanham hoje de verdade (faturamento, lucro, nº de eventos, taxa de ocupação da escala)?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Com que frequência esses números são olhados — diário, semanal, mensal?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -305,9 +314,9 @@
       <div class="section-eyebrow"><span class="section-num">11</span><span class="section-label">Migração</span></div>
       <h2 class="section-title">Dados Existentes e Integrações</h2>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas planilhas/arquivos existem hoje que precisam migrar para o sistema novo?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">É importante manter o histórico de eventos passados dentro do sistema, ou só a partir de agora?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum outro sistema (folha de pagamento, WhatsApp Business) que precisa se conectar a este?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas planilhas/arquivos existem hoje que precisam migrar para o sistema novo?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">É importante manter o histórico de eventos passados dentro do sistema, ou só a partir de agora?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum outro sistema (folha de pagamento, WhatsApp Business) que precisa se conectar a este?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -318,25 +327,25 @@
 
       <p class="subhead">Site Institucional</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês têm site hoje? Está atualizado e gera algum contato/lead de verdade?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quando uma empresa procura "bombeiro civil para evento" na região, ela encontra vocês com facilidade?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês têm site hoje? Está atualizado e gera algum contato/lead de verdade?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quando uma empresa procura "bombeiro civil para evento" na região, ela encontra vocês com facilidade?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
 
       <p class="subhead">ChatBot com IA (WhatsApp)</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O primeiro contato de um cliente novo é respondido manualmente? Por quantas pessoas, e em quanto tempo?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês perdem oportunidade por demora na resposta fora do horário comercial ou fim de semana?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O primeiro contato de um cliente novo é respondido manualmente? Por quantas pessoas, e em quanto tempo?</div><textarea class="qnote qnote--lg" rows="2" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês perdem oportunidade por demora na resposta fora do horário comercial ou fim de semana?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
 
       <p class="subhead">CRM — Funil de Vendas</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como vocês acompanham hoje uma proposta enviada até o fechamento (planilha, papel, ou só memória)?</div><div class="qnote"></div></div></li>
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe follow-up estruturado com quem pediu orçamento e não fechou?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como vocês acompanham hoje uma proposta enviada até o fechamento (planilha, papel, ou só memória)?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe follow-up estruturado com quem pediu orçamento e não fechou?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
 
       <p class="subhead">Automações de Processos</p>
       <ul class="qlist">
-        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Fora do que já mapeamos aqui (escala e financeiro), existe algum processo manual repetitivo que consome tempo do time toda semana?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Fora do que já mapeamos aqui (escala e financeiro), existe algum processo manual repetitivo que consome tempo do time toda semana?</div><textarea class="qnote" rows="1" placeholder="Anote a resposta aqui..."></textarea></div></li>
       </ul>
     </div>
 
@@ -353,6 +362,12 @@
   document.getElementById("btnPrint").addEventListener("click", function(){ window.print(); });
   Array.prototype.forEach.call(document.querySelectorAll(".box"), function(box){
     box.addEventListener("click", function(){ box.classList.toggle("checked"); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".qnote"), function(el){
+    el.addEventListener("input", function(){
+      el.style.height = "auto";
+      el.style.height = Math.max(el.scrollHeight, el.offsetHeight) + "px";
+    });
   });
 </script>
 
