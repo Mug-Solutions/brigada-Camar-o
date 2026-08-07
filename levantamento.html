@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Levantamento de Requisitos — Brigada Camarão · MUG Solutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple:        #4444BB;
+    --purple-dark:   #2e2e8a;
+    --purple-light:  #6868cc;
+    --purple-bg:     #f0f0fa;
+    --purple-border: #d0d0ef;
+    --dark:          #1a1a2e;
+    --text:          #2d2d3a;
+    --muted:         #7070a0;
+    --light:         #f8f8fd;
+    --white:         #ffffff;
+    --border:        #e2e2f0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #eeeef8;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  :focus-visible{ outline:2px solid var(--purple); outline-offset:2px; }
+
+  /* ── LOGO ─────────────────────────────────────── */
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-name { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; line-height: 1; }
+  .logo-name.white { color: white; }
+  .logo-tag { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .logo-tag.white { color: rgba(255,255,255,0.6); }
+
+  /* ── BANNER (adaptado da capa da proposta, sem quebra de pagina forcada) ── */
+  .banner{ background:var(--purple-dark); position:relative; overflow:hidden; }
+  .banner-deco-1{ position:absolute; top:-160px; right:-160px; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle, rgba(100,100,220,0.35) 0%, transparent 70%); pointer-events:none; }
+  .banner-deco-2{ position:absolute; bottom:-100px; left:-80px; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle, rgba(80,80,180,0.2) 0%, transparent 70%); pointer-events:none; }
+  .banner-nav{ display:flex; justify-content:space-between; align-items:center; padding:24px 48px; position:relative; z-index:2; }
+  .banner-badge{ background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.8); font-size:11px; font-weight:500; letter-spacing:0.08em; padding:6px 14px; border-radius:20px; }
+  .banner-body{ padding: 8px 48px 36px; position:relative; z-index:2; max-width:760px; }
+  .banner-for{ display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:6px 14px; margin-bottom:18px; }
+  .banner-for-label{ font-size:10px; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:rgba(255,255,255,0.45); }
+  .banner-for-value{ font-size:13px; font-weight:600; color:rgba(255,255,255,0.9); }
+  .banner-for-dot{ width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,0.25); }
+  .banner-title{ font-family:'Outfit', sans-serif; font-size:36px; font-weight:700; line-height:1.15; color:white; letter-spacing:-0.02em; margin-bottom:14px; }
+  .banner-desc{ font-size:14px; color:rgba(255,255,255,0.6); max-width:520px; line-height:1.7; font-weight:300; }
+  .banner-foot{ display:flex; justify-content:space-between; align-items:flex-end; padding:18px 48px 22px; border-top:1px solid rgba(255,255,255,0.08); position:relative; z-index:2; }
+  .banner-meta{ display:flex; gap:22px; flex-wrap:wrap; }
+  .banner-meta-item{ font-size:12px; color:rgba(255,255,255,0.4); }
+  .banner-meta-item strong{ color:rgba(255,255,255,0.75); }
+
+  /* ── PAGINA / CORPO ────────────────────────────── */
+  .page{ max-width:900px; margin:0 auto; background:var(--white); }
+  .page-body{ padding:44px 56px 8px; }
+
+  /* ── COMO USAR ────────────────────────────────── */
+  .howto{ background:var(--purple-bg); border:1px solid var(--purple-border); border-left:3px solid var(--purple); border-radius:8px; padding:18px 22px; margin-bottom:40px; }
+  .howto b{ color:var(--dark); font-size:13px; }
+  .howto ul{ margin:10px 0 0; padding-left:18px; color:#555570; font-size:13px; line-height:1.7; }
+
+  /* ── SUMARIO ──────────────────────────────────── */
+  .toc{ border:1px solid var(--border); border-radius:8px; padding:20px 22px 22px; margin-bottom:48px; }
+  .toc-title{ font-size:10px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .toc ol{ list-style:none; columns:2; column-gap:24px; }
+  .toc li{ font-size:13px; margin-bottom:8px; break-inside:avoid; }
+  .toc a{ color:var(--text); text-decoration:none; }
+  .toc a:hover{ color:var(--purple); }
+  .toc .n{ display:inline-block; min-width:20px; font-family:'Outfit',sans-serif; font-weight:700; color:var(--purple); font-variant-numeric:tabular-nums; }
+
+  /* ── SECOES (identico ao padrao MUG) ─────────── */
+  .section{ margin-bottom:46px; break-inside:avoid; }
+  .section-eyebrow{ display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .section-num{ font-size:10px; font-weight:700; letter-spacing:0.1em; color:var(--white); background:var(--purple); padding:2px 8px; border-radius:3px; }
+  .section-label{ font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--purple); }
+  .section-title{ font-family:'Outfit', sans-serif; font-size:22px; font-weight:600; color:var(--dark); line-height:1.2; margin-bottom:4px; letter-spacing:-0.01em; }
+  .section-why{ font-size:12.5px; color:var(--muted); font-style:italic; margin-bottom:14px; }
+
+  /* ── PERGUNTAS ────────────────────────────────── */
+  .qlist{ list-style:none; display:flex; flex-direction:column; }
+  .qitem{ display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+  .qitem:last-child{ border-bottom:none; }
+  .box{ flex-shrink:0; width:16px; height:16px; margin-top:2px; border:1.5px solid var(--purple-light); border-radius:4px; cursor:pointer; position:relative; }
+  .box.checked{ background:var(--purple); border-color:var(--purple); }
+  .box.checked::after{ content:""; position:absolute; left:4px; top:1px; width:5px; height:9px; border:solid white; border-width:0 2px 2px 0; transform:rotate(45deg); }
+  .qbody{ flex:1; min-width:0; }
+  .qtext{ font-size:13.5px; color:var(--text); line-height:1.6; }
+  .qnote{ margin-top:9px; height:17px; border-bottom:1px dotted var(--border); }
+
+  /* ── RODAPE ───────────────────────────────────── */
+  .site-footer{ background:var(--dark); color:rgba(255,255,255,0.4); display:flex; justify-content:space-between; align-items:center; padding:20px 56px; font-size:11.5px; max-width:900px; margin:40px auto 0; }
+  .site-footer a{ color:rgba(180,180,255,0.7); text-decoration:none; }
+
+  /* ── BOTAO IMPRIMIR ───────────────────────────── */
+  .print-btn{ position:fixed; top:20px; right:20px; z-index:10; background:var(--purple); color:white; border:none; border-radius:7px; padding:9px 16px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; box-shadow:0 10px 24px -10px rgba(46,46,138,0.5); }
+  .print-btn:hover{ background:var(--purple-dark); }
+
+  @media print{
+    .print-btn{ display:none; }
+    body{ background:white; }
+  }
+  @media (max-width:700px){
+    .banner-nav, .banner-body, .banner-foot, .page-body, .site-footer{ padding-left:22px; padding-right:22px; }
+    .banner-title{ font-size:28px; }
+    .toc ol{ columns:1; }
+    .banner-foot{ flex-direction:column; align-items:flex-start; gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" id="btnPrint">↓ Imprimir / PDF</button>
+
+<div class="banner">
+  <div class="banner-deco-1"></div>
+  <div class="banner-deco-2"></div>
+  <div class="banner-nav">
+    <div class="logo-wrap">
+      <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="10" fill="#4444BB"/>
+        <path d="M32 22 C32 27.52 27.52 32 22 32 C16.48 32 12 27.52 12 22 C12 16.48 16.48 12 22 12" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <rect x="16.5" y="18" width="9" height="10" rx="1.5" fill="white"/>
+        <path d="M25.5 21 C27.5 21 28.5 22 28.5 23.5 C28.5 25 27.5 26 25.5 26" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="17.5" y="28" width="7" height="1.5" rx="0.75" fill="white"/>
+      </svg>
+      <div>
+        <div class="logo-name white">MUG Solutions</div>
+        <div class="logo-tag white">Tecnologia, Soluções e Inovação</div>
+      </div>
+    </div>
+    <span class="banner-badge">Discovery · Reunião de Levantamento</span>
+  </div>
+  <div class="banner-body">
+    <div class="banner-for">
+      <span class="banner-for-label">Elaborado para</span>
+      <div class="banner-for-dot"></div>
+      <span class="banner-for-value">Brigada Camarão</span>
+    </div>
+    <h1 class="banner-title">Levantamento de Requisitos<br>do Sistema de Gestão</h1>
+    <p class="banner-desc">Roteiro de perguntas para a call com o cliente — para mapear tudo que o sistema completo precisa cobrir antes de sair do protótipo para a construção real.</p>
+  </div>
+  <div class="banner-foot">
+    <div class="banner-meta">
+      <span class="banner-meta-item">Preparado por <strong>Gabriel Barcelos</strong></span>
+      <span class="banner-meta-item">Contato: <strong>contato@mugsolution.com.br</strong></span>
+    </div>
+    <div class="banner-meta"><span class="banner-meta-item">Belo Horizonte — MG</span></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-body">
+
+    <div class="howto">
+      <b>Como usar este roteiro:</b>
+      <ul>
+        <li>Siga a ordem sugerida — ela começa em contexto/prioridade e só depois entra em detalhe técnico.</li>
+        <li>Marque a caixinha ao lado de cada pergunta feita e anote a resposta na linha logo abaixo.</li>
+        <li>Nem toda pergunta precisa de resposta fechada na call — "não sabemos ainda" também é uma resposta válida e vira decisão em aberto.</li>
+      </ul>
+    </div>
+
+    <nav class="toc">
+      <p class="toc-title">Seções</p>
+      <ol>
+        <li><a href="#s1"><span class="n">01</span>Contexto e Prioridades</a></li>
+        <li><a href="#s2"><span class="n">02</span>Bombeiros — Cadastro e Compliance</a></li>
+        <li><a href="#s3"><span class="n">03</span>Clientes / Contratantes</a></li>
+        <li><a href="#s4"><span class="n">04</span>Eventos e Contratos</a></li>
+        <li><a href="#s5"><span class="n">05</span>Escala e Alocação</a></li>
+        <li><a href="#s6"><span class="n">06</span>Precificação e Remuneração</a></li>
+        <li><a href="#s7"><span class="n">07</span>Financeiro e Faturamento</a></li>
+        <li><a href="#s8"><span class="n">08</span>Materiais e Equipamentos</a></li>
+        <li><a href="#s9"><span class="n">09</span>Usuários, Acessos e Notificações</a></li>
+        <li><a href="#s10"><span class="n">10</span>Relatórios e Indicadores</a></li>
+        <li><a href="#s11"><span class="n">11</span>Dados Existentes e Integrações</a></li>
+      </ol>
+    </nav>
+
+    <div class="section" id="s1">
+      <div class="section-eyebrow"><span class="section-num">01</span><span class="section-label">Abertura</span></div>
+      <h2 class="section-title">Contexto e Prioridades</h2>
+      <p class="section-why">Vale abrir a call por aqui — o resto das respostas muda de peso dependendo do volume e do prazo.</p>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantos eventos vocês atendem por mês hoje, em média? E nos meses de pico?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a meta de crescimento para os próximos 12 meses?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma data-alvo para o sistema entrar em uso (início de temporada, evento específico)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se não der para entregar tudo de uma vez, o que dói mais hoje: cadastro/compliance, montar escala, ou controle financeiro?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas pessoas da equipe vão usar o sistema no dia a dia, e em quais funções (operação, financeiro, direção)?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s2">
+      <div class="section-eyebrow"><span class="section-num">02</span><span class="section-label">Equipe</span></div>
+      <h2 class="section-title">Bombeiros — Cadastro e Compliance</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Além de ASO, E-Social e Credenciamento, existe outro documento obrigatório (curso NR-23, CNH, ficha de EPI, exame toxicológico)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Os bombeiros são intermitentes, CLT ou PJ? Isso muda como calculamos e pagamos cada diária?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quando um documento vence, o que acontece — alguém acompanha manualmente, ou passa despercebido?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um bombeiro com documento vencido pode continuar sendo escalado na prática, ou isso já é proibido hoje?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês registram disponibilidade (dias, horários, regiões) de cada bombeiro, ou a escolha é sempre manual?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existem outras funções/hierarquias além de "Bombeiro Civil" e "Líder" (ex: socorrista, motorista, coordenador)?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s3">
+      <div class="section-eyebrow"><span class="section-num">03</span><span class="section-label">Contratantes</span></div>
+      <h2 class="section-title">Clientes / Contratantes</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais dados vocês precisam guardar de cada empresa contratante (CNPJ, contato responsável, endereço, forma de pagamento)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Clientes recorrentes (como Arena MRV, Biocor) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o cliente ter algum tipo de acesso para acompanhar a escala do próprio evento, ou isso é só interno?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s4">
+      <div class="section-eyebrow"><span class="section-num">04</span><span class="section-label">Operação</span></div>
+      <h2 class="section-title">Eventos e Contratos</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como chega hoje o pedido de um evento — WhatsApp, e-mail, ligação? Faz sentido um formulário próprio para captar isso?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe uma etapa de orçamento/proposta antes do contrato fechar, ou o valor já vem definido pelo cliente?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Um evento pode ter mais de um turno por dia e mais de um dia — como vocês organizam isso hoje?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O que acontece em caso de cancelamento ou remarcação — existe alguma regra de multa ou reembolso?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s5">
+      <div class="section-eyebrow"><span class="section-num">05</span><span class="section-label">Operação</span></div>
+      <h2 class="section-title">Escala e Alocação</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Hoje, quem monta a escala e com base em quê (proximidade, ordem de chegada, preferência do bombeiro)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é registrado o horário cumprido — papel, aplicativo, alguém liga confirmando?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Se um bombeiro escalado falta de última hora, como vocês resolvem hoje? Precisa de uma "lista de reserva" no sistema?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido o próprio bombeiro ter acesso pelo celular para ver a escala e confirmar presença?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s6">
+      <div class="section-eyebrow"><span class="section-num">06</span><span class="section-label">Financeiro</span></div>
+      <h2 class="section-title">Precificação e Remuneração</h2>
+      <p class="section-why">Essa régua define o motor de cálculo do sistema — vale entender a lógica completa, não só os valores que já vimos na planilha.</p>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual é a régua de valores por turno hoje (diurno, noturno, e o valor maior que vimos) — como esses valores são definidos?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor pago varia por função (líder ganha mais que bombeiro civil), por cliente, ou por tipo de evento?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe adicional noturno, hora extra, ou DSR (descanso semanal remunerado) a calcular?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O valor de alimentação é sempre fixo, ou muda conforme o evento/cliente?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é definido o valor cobrado do cliente — margem fixa sobre o custo, tabela por tipo de evento, ou negociação caso a caso?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s7">
+      <div class="section-eyebrow"><span class="section-num">07</span><span class="section-label">Financeiro</span></div>
+      <h2 class="section-title">Financeiro e Faturamento</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">O sistema precisa emitir nota fiscal/recibo, ou isso continua em outra ferramenta (contador, ERP)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Como é feito o pagamento aos bombeiros — PIX individual, transferência em lote, dentro da folha?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês têm problema de inadimplência de clientes? Precisa de algum controle de cobrança automática?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Qual relatório financeiro é mais importante: lucro por evento, por cliente, ou por período (mês/trimestre)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum sistema contábil ou ERP que precisa "conversar" com esse sistema?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s8">
+      <div class="section-eyebrow"><span class="section-num">08</span><span class="section-label">Logística</span></div>
+      <h2 class="section-title">Materiais e Equipamentos</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Extintores, DEA e outros materiais são da empresa ou alugados por evento?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Precisa controlar estoque, manutenção e validade de carga desses equipamentos dentro do sistema?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe checklist de saída e retorno de material por evento?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s9">
+      <div class="section-eyebrow"><span class="section-num">09</span><span class="section-label">Sistema</span></div>
+      <h2 class="section-title">Usuários, Acessos e Notificações</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Pessoas diferentes devem ver coisas diferentes no sistema (ex: operação não vê o lucro, financeiro não mexe na escala)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Vocês querem alertas automáticos (documento vencendo, escala incompleta, pagamento atrasado)? Por e-mail, WhatsApp, ou dentro do sistema?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Faz sentido confirmar a escala com o bombeiro automaticamente por WhatsApp?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s10">
+      <div class="section-eyebrow"><span class="section-num">10</span><span class="section-label">Gestão</span></div>
+      <h2 class="section-title">Relatórios e Indicadores</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quais números vocês acompanham hoje de verdade (faturamento, lucro, nº de eventos, taxa de ocupação da escala)?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Com que frequência esses números são olhados — diário, semanal, mensal?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+    <div class="section" id="s11">
+      <div class="section-eyebrow"><span class="section-num">11</span><span class="section-label">Migração</span></div>
+      <h2 class="section-title">Dados Existentes e Integrações</h2>
+      <ul class="qlist">
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Quantas planilhas/arquivos existem hoje que precisam migrar para o sistema novo?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">É importante manter o histórico de eventos passados dentro do sistema, ou só a partir de agora?</div><div class="qnote"></div></div></li>
+        <li class="qitem"><span class="box"></span><div class="qbody"><div class="qtext">Existe algum outro sistema (folha de pagamento, WhatsApp Business) que precisa se conectar a este?</div><div class="qnote"></div></div></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<div class="site-footer">
+  <span>MUG Solutions · Tecnologia, Soluções e Inovação · BH — MG</span>
+  <span><a href="mailto:contato@mugsolution.com.br">contato@mugsolution.com.br</a></span>
+  <span>Discovery · Brigada Camarão</span>
+</div>
+
+<script>
+  document.getElementById("btnPrint").addEventListener("click", function(){ window.print(); });
+  Array.prototype.forEach.call(document.querySelectorAll(".box"), function(box){
+    box.addEventListener("click", function(){ box.classList.toggle("checked"); });
+  });
+</script>
+
+</body>
+</html>

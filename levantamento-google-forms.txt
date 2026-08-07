@@ -1,0 +1,71 @@
+LEVANTAMENTO DE REQUISITOS — SISTEMA BRIGADA CAMARÃO
+Como usar: no Google Forms, cole o bloco de uma seção por vez no campo de
+título da primeira pergunta — o Forms detecta a lista e oferece criar uma
+pergunta separada para cada linha. Ajuste o tipo de cada pergunta para
+"Resposta curta" ou "Parágrafo" depois de gerado.
+Crie uma seção nova (ícone de duas barras na barra lateral) para cada bloco abaixo.
+
+=== SEÇÃO 1 — CONTEXTO E PRIORIDADES ===
+Quantos eventos vocês atendem por mês hoje, em média? E nos meses de pico?
+Qual é a meta de crescimento para os próximos 12 meses?
+Existe uma data-alvo para o sistema entrar em uso (início de temporada, evento específico)?
+Se não der para entregar tudo de uma vez, o que dói mais hoje: cadastro/compliance, montar escala, ou controle financeiro?
+Quantas pessoas da equipe vão usar o sistema no dia a dia, e em quais funções (operação, financeiro, direção)?
+
+=== SEÇÃO 2 — BOMBEIROS: CADASTRO E COMPLIANCE ===
+Além de ASO, E-Social e Credenciamento, existe outro documento obrigatório (curso NR-23, CNH, ficha de EPI, exame toxicológico)?
+Os bombeiros são intermitentes, CLT ou PJ? Isso muda como calculamos e pagamos cada diária?
+Hoje, quando um documento vence, o que acontece — alguém acompanha manualmente, ou passa despercebido?
+Um bombeiro com documento vencido pode continuar sendo escalado na prática, ou isso já é proibido hoje?
+Vocês registram disponibilidade (dias, horários, regiões) de cada bombeiro, ou a escolha é sempre manual?
+Existem outras funções/hierarquias além de "Bombeiro Civil" e "Líder" (ex: socorrista, motorista, coordenador)?
+
+=== SEÇÃO 3 — CLIENTES / CONTRATANTES ===
+Quais dados vocês precisam guardar de cada empresa contratante (CNPJ, contato responsável, endereço, forma de pagamento)?
+Clientes recorrentes (como Arena MRV, Biocor) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?
+Faz sentido o cliente ter algum tipo de acesso para acompanhar a escala do próprio evento, ou isso é só interno?
+
+=== SEÇÃO 4 — EVENTOS E CONTRATOS ===
+Como chega hoje o pedido de um evento — WhatsApp, e-mail, ligação? Faz sentido um formulário próprio para captar isso?
+Existe uma etapa de orçamento/proposta antes do contrato fechar, ou o valor já vem definido pelo cliente?
+Um evento pode ter mais de um turno por dia e mais de um dia — como vocês organizam isso hoje?
+O que acontece em caso de cancelamento ou remarcação — existe alguma regra de multa ou reembolso?
+
+=== SEÇÃO 5 — ESCALA E ALOCAÇÃO ===
+Hoje, quem monta a escala e com base em quê (proximidade, ordem de chegada, preferência do bombeiro)?
+Como é registrado o horário cumprido — papel, aplicativo, alguém liga confirmando?
+Se um bombeiro escalado falta de última hora, como vocês resolvem hoje? Precisa de uma "lista de reserva" no sistema?
+Faz sentido o próprio bombeiro ter acesso pelo celular para ver a escala e confirmar presença?
+
+=== SEÇÃO 6 — PRECIFICAÇÃO E REMUNERAÇÃO ===
+Qual é a régua de valores por turno hoje (diurno, noturno, e o valor maior que vimos) — como esses valores são definidos?
+O valor pago varia por função (líder ganha mais que bombeiro civil), por cliente, ou por tipo de evento?
+Existe adicional noturno, hora extra, ou DSR (descanso semanal remunerado) a calcular?
+O valor de alimentação é sempre fixo, ou muda conforme o evento/cliente?
+Como é definido o valor cobrado do cliente — margem fixa sobre o custo, tabela por tipo de evento, ou negociação caso a caso?
+
+=== SEÇÃO 7 — FINANCEIRO E FATURAMENTO ===
+O sistema precisa emitir nota fiscal/recibo, ou isso continua em outra ferramenta (contador, ERP)?
+Como é feito o pagamento aos bombeiros — PIX individual, transferência em lote, dentro da folha?
+Vocês têm problema de inadimplência de clientes? Precisa de algum controle de cobrança automática?
+Qual relatório financeiro é mais importante: lucro por evento, por cliente, ou por período (mês/trimestre)?
+Existe algum sistema contábil ou ERP que precisa "conversar" com esse sistema?
+
+=== SEÇÃO 8 — MATERIAIS E EQUIPAMENTOS ===
+Extintores, DEA e outros materiais são da empresa ou alugados por evento?
+Precisa controlar estoque, manutenção e validade de carga desses equipamentos dentro do sistema?
+Existe checklist de saída e retorno de material por evento?
+
+=== SEÇÃO 9 — USUÁRIOS, ACESSOS E NOTIFICAÇÕES ===
+Pessoas diferentes devem ver coisas diferentes no sistema (ex: operação não vê o lucro, financeiro não mexe na escala)?
+Vocês querem alertas automáticos (documento vencendo, escala incompleta, pagamento atrasado)? Por e-mail, WhatsApp, ou dentro do sistema?
+Faz sentido confirmar a escala com o bombeiro automaticamente por WhatsApp?
+
+=== SEÇÃO 10 — RELATÓRIOS E INDICADORES ===
+Quais números vocês acompanham hoje de verdade (faturamento, lucro, nº de eventos, taxa de ocupação da escala)?
+Com que frequência esses números são olhados — diário, semanal, mensal?
+
+=== SEÇÃO 11 — DADOS EXISTENTES E INTEGRAÇÕES ===
+Quantas planilhas/arquivos existem hoje que precisam migrar para o sistema novo?
+É importante manter o histórico de eventos passados dentro do sistema, ou só a partir de agora?
+Existe algum outro sistema (folha de pagamento, WhatsApp Business) que precisa se conectar a este?
