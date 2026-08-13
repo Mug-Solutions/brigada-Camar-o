@@ -1,17 +1,26 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { fmtDateBR, fmtMoney } from "@/lib/domain";
+import { MOCK_EVENTOS } from "@/lib/mock-data";
+import { DemoBanner } from "@/components/DemoBanner";
 import type { Evento } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function EventosPage() {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("eventos")
-    .select("*")
-    .order("data_inicio", { ascending: true });
+  const supabase = getServerSupabaseClient();
+  const demo = !supabase;
 
-  const eventos = (data ?? []) as Evento[];
+  let eventos: Evento[] = MOCK_EVENTOS;
+  let error: { message: string } | null = null;
+
+  if (supabase) {
+    const result = await supabase
+      .from("eventos")
+      .select("*")
+      .order("data_inicio", { ascending: true });
+    eventos = (result.data ?? []) as Evento[];
+    error = result.error;
+  }
 
   return (
     <div>
@@ -26,6 +35,8 @@ export default async function EventosPage() {
           Contratos recebidos de empresas organizadoras e a escala de bombeiros alocada em cada um.
         </p>
       </div>
+
+      {demo && <DemoBanner />}
 
       <div className="panel-block mb-4">
         <div className="overflow-x-auto">

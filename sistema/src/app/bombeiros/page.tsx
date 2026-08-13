@@ -1,27 +1,34 @@
 import Link from "next/link";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { bombeiroAptidao, docStatus, fmtDateBR } from "@/lib/domain";
+import { MOCK_BOMBEIROS } from "@/lib/mock-data";
 import { Chip } from "@/components/Chip";
+import { DemoBanner } from "@/components/DemoBanner";
 import type { Bombeiro } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function BombeirosPage() {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("bombeiros")
-    .select("*")
-    .order("nome", { ascending: true });
+  const supabase = getServerSupabaseClient();
+  const demo = !supabase;
 
-  if (error) {
-    return (
-      <div className="panel-block p-6 text-sm" style={{ color: "var(--crit)" }}>
-        Erro ao carregar bombeiros: {error.message}
-      </div>
-    );
+  let bombeiros: Bombeiro[] = MOCK_BOMBEIROS;
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from("bombeiros")
+      .select("*")
+      .order("nome", { ascending: true });
+
+    if (error) {
+      return (
+        <div className="panel-block p-6 text-sm" style={{ color: "var(--crit)" }}>
+          Erro ao carregar bombeiros: {error.message}
+        </div>
+      );
+    }
+    bombeiros = (data ?? []) as Bombeiro[];
   }
-
-  const bombeiros = (data ?? []) as Bombeiro[];
 
   return (
     <div>
@@ -41,6 +48,8 @@ export default async function BombeirosPage() {
           + Novo Bombeiro
         </Link>
       </div>
+
+      {demo && <DemoBanner />}
 
       <div className="panel-block">
         <div className="overflow-x-auto">

@@ -1,5 +1,7 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { bombeiroAptidao, fmtMoney } from "@/lib/domain";
+import { MOCK_BOMBEIROS, MOCK_EVENTOS } from "@/lib/mock-data";
+import { DemoBanner } from "@/components/DemoBanner";
 import type { Bombeiro, Evento } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -27,15 +29,20 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub: string 
 }
 
 export default async function PainelPage() {
-  const supabase = createServerSupabaseClient();
+  const supabase = getServerSupabaseClient();
+  const demo = !supabase;
 
-  const [{ data: bombeirosData }, { data: eventosData }] = await Promise.all([
-    supabase.from("bombeiros").select("*"),
-    supabase.from("eventos").select("*"),
-  ]);
+  let bombeiros: Bombeiro[] = MOCK_BOMBEIROS;
+  let eventos: Evento[] = MOCK_EVENTOS;
 
-  const bombeiros = (bombeirosData ?? []) as Bombeiro[];
-  const eventos = (eventosData ?? []) as Evento[];
+  if (supabase) {
+    const [{ data: bombeirosData }, { data: eventosData }] = await Promise.all([
+      supabase.from("bombeiros").select("*"),
+      supabase.from("eventos").select("*"),
+    ]);
+    bombeiros = (bombeirosData ?? []) as Bombeiro[];
+    eventos = (eventosData ?? []) as Evento[];
+  }
 
   const ativos = bombeiros.filter((b) => b.esocial_status === "Ativo").length;
   const pendencias = bombeiros.filter((b) => bombeiroAptidao(b).level !== "ok").length;
@@ -57,6 +64,8 @@ export default async function PainelPage() {
         </p>
       </div>
 
+      {demo && <DemoBanner />}
+
       <div className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Kpi label="Bombeiros Ativos" value={`${ativos} / ${bombeiros.length}`} sub="cadastrados no quadro" />
         <Kpi label="Pendências de Documento" value={String(pendencias)} sub={pendencias ? "requer atenção" : "tudo em dia"} />
@@ -65,7 +74,7 @@ export default async function PainelPage() {
         <Kpi label="Faturamento Total" value={fmtMoney(faturamentoTotal)} sub="soma dos fechamentos" />
       </div>
 
-      {bombeiros.length === 0 && eventos.length === 0 && (
+      {!demo && bombeiros.length === 0 && eventos.length === 0 && (
         <div className="panel-block p-6 text-[13.5px]" style={{ color: "var(--text-soft)" }}>
           Banco de dados vazio — cadastre o primeiro bombeiro para começar a ver os números aqui.
         </div>
