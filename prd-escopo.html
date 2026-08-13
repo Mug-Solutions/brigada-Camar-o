@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PRD de Escopo — Brigada Camarão · MUG Solutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #4444BB;
+    --purple-dark: #2e2e8a;
+    --purple-light: #6868cc;
+    --purple-bg: #f0f0fa;
+    --purple-border: #d0d0ef;
+    --dark: #1a1a2e;
+    --text: #2d2d3a;
+    --muted: #7070a0;
+    --light: #f8f8fd;
+    --white: #ffffff;
+    --border: #e2e2f0;
+    --ok: #1a7a4a; --ok-bg: #f0faf4; --ok-border: #b8e8cc;
+    --warn: #a2740a; --warn-bg: #fbf3df; --warn-border: #ecd9a4;
+    --off: #8888a0; --off-bg: #f4f4f8; --off-border: #e2e2ee;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #eeeef8;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  :focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-name { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; line-height: 1; }
+  .logo-name.white { color: white; }
+  .logo-tag { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .logo-tag.white { color: rgba(255,255,255,0.6); }
+
+  .banner { background: var(--purple-dark); position: relative; overflow: hidden; }
+  .banner-deco-1 { position: absolute; top: -160px; right: -160px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(100,100,220,0.35) 0%, transparent 70%); pointer-events: none; }
+  .banner-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; position: relative; z-index: 2; }
+  .banner-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 20px; }
+  .banner-body { padding: 8px 48px 36px; position: relative; z-index: 2; max-width: 760px; }
+  .banner-for { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 14px; margin-bottom: 18px; }
+  .banner-for-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  .banner-for-value { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .banner-for-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); }
+  .banner-title { font-family: 'Outfit', sans-serif; font-size: 34px; font-weight: 700; line-height: 1.15; color: white; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .banner-desc { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 560px; line-height: 1.7; font-weight: 300; }
+
+  .page { max-width: 940px; margin: 0 auto; background: var(--white); }
+  .page-body { padding: 44px 56px 8px; }
+
+  .howto { background: var(--purple-bg); border: 1px solid var(--purple-border); border-left: 3px solid var(--purple); border-radius: 8px; padding: 18px 22px; margin-bottom: 32px; }
+  .howto b { color: var(--dark); font-size: 13px; }
+  .howto ul { margin: 10px 0 0; padding-left: 18px; color: #555570; font-size: 13px; line-height: 1.7; }
+
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); background: var(--light); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 8px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 44px; }
+  .cfield label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px; }
+  .cfield input, .cfield textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: 'Inter', sans-serif; font-size: 13.5px; color: var(--text); background: var(--light); }
+  .cfield input:focus, .cfield textarea:focus { outline: none; border-color: var(--purple); background: var(--white); }
+  .cfield.full { grid-column: 1 / -1; }
+
+  .section { margin-bottom: 46px; }
+  .section-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .section-num { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--white); background: var(--purple); padding: 2px 8px; border-radius: 3px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple); }
+  .section-title { font-family: 'Outfit', sans-serif; font-size: 21px; font-weight: 600; color: var(--dark); line-height: 1.2; margin: 6px 0 16px; letter-spacing: -0.01em; }
+
+  .feat-table { width: 100%; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .feat-row { display: grid; grid-template-columns: 1fr 300px; gap: 12px; align-items: center; padding: 13px 18px; border-bottom: 1px solid var(--border); }
+  .feat-row:last-child { border-bottom: none; }
+  .feat-row:nth-child(even) { background: var(--light); }
+  .feat-text { font-size: 13.5px; color: var(--text); }
+  .feat-opts { display: flex; gap: 6px; }
+  .feat-opt { flex: 1; }
+  .feat-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .feat-opt span {
+    display: block; text-align: center; font-size: 11px; font-weight: 600;
+    padding: 6px 4px; border-radius: 6px; border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; background: var(--white); transition: all 120ms ease;
+  }
+  .feat-opt input:checked + span.opt-essencial { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .feat-opt input:checked + span.opt-desejavel { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+  .feat-opt input:checked + span.opt-nao { background: var(--off-bg); border-color: var(--off-border); color: var(--off); }
+  .feat-opt input:focus-visible + span { outline: 2px solid var(--purple); outline-offset: 1px; }
+
+  .section-notes { margin-top: 12px; }
+  .section-notes label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: block; margin-bottom: 6px; }
+  .section-notes textarea { width: 100%; min-height: 50px; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text); background: var(--light); resize: vertical; }
+  .section-notes textarea:focus { outline: none; border-color: var(--purple); background: var(--white); }
+
+  .summary-box { background: var(--dark); border-radius: 12px; padding: 28px 32px; margin: 10px 0 40px; }
+  .summary-box h2 { font-family: 'Outfit', sans-serif; color: white; font-size: 19px; margin-bottom: 8px; }
+  .summary-box p { color: rgba(255,255,255,0.55); font-size: 13px; margin-bottom: 18px; max-width: 60ch; }
+  .summary-actions { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .btn { border: none; padding: 11px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .btn--primary { background: var(--purple); color: white; }
+  .btn--primary:hover { background: var(--purple-light); }
+  .btn--ghost { background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.15); }
+  #resumoOut {
+    width: 100%; min-height: 180px; background: #12122a; color: #d8d8f0; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 16px; font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.6; display: none;
+  }
+  .copy-msg { color: #9fdbb8; font-size: 12px; margin-top: 8px; display: none; }
+
+  .site-footer { background: var(--dark); color: rgba(255,255,255,0.4); display: flex; justify-content: space-between; align-items: center; padding: 20px 56px; font-size: 11.5px; max-width: 940px; margin: 0 auto; flex-wrap: wrap; gap: 6px; }
+  .site-footer a { color: rgba(180,180,255,0.7); text-decoration: none; }
+
+  .print-btn { position: fixed; top: 20px; right: 20px; z-index: 10; background: var(--purple); color: white; border: none; border-radius: 7px; padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 10px 24px -10px rgba(46,46,138,0.5); }
+  .print-btn:hover { background: var(--purple-dark); }
+
+  @media print {
+    .print-btn, .summary-actions, #resumoOut, .copy-msg { display: none !important; }
+    body { background: white; }
+  }
+  @media (max-width: 720px) {
+    .banner-nav, .banner-body, .page-body, .site-footer { padding-left: 22px; padding-right: 22px; }
+    .banner-title { font-size: 26px; }
+    .context-grid { grid-template-columns: 1fr; }
+    .feat-row { grid-template-columns: 1fr; }
+    .feat-opts { margin-top: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" id="btnPrint">↓ Imprimir / PDF</button>
+
+<div class="banner">
+  <div class="banner-deco-1"></div>
+  <div class="banner-nav">
+    <div class="logo-wrap">
+      <svg width="40" height="40" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="10" fill="#4444BB"/>
+        <path d="M32 22 C32 27.52 27.52 32 22 32 C16.48 32 12 27.52 12 22 C12 16.48 16.48 12 22 12" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <rect x="16.5" y="18" width="9" height="10" rx="1.5" fill="white"/>
+        <path d="M25.5 21 C27.5 21 28.5 22 28.5 23.5 C28.5 25 27.5 26 25.5 26" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="17.5" y="28" width="7" height="1.5" rx="0.75" fill="white"/>
+      </svg>
+      <div>
+        <div class="logo-name white">MUG Solutions</div>
+        <div class="logo-tag white">Tecnologia, Soluções e Inovação</div>
+      </div>
+    </div>
+    <span class="banner-badge">PRD de Escopo · 2026</span>
+  </div>
+  <div class="banner-body">
+    <div class="banner-for">
+      <span class="banner-for-label">Para preenchimento de</span>
+      <div class="banner-for-dot"></div>
+      <span class="banner-for-value">Brigada Camarão</span>
+    </div>
+    <h1 class="banner-title">Checklist de Escopo do Sistema</h1>
+    <p class="banner-desc">Depois da nossa conversa, ficou claro que o sistema precisa cobrir mais do que imaginávamos de início. Este checklist ajuda a gente a medir com precisão o tamanho real do projeto — marque cada item conforme a necessidade de vocês.</p>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-body">
+
+    <div class="howto">
+      <b>Como preencher:</b>
+      <ul>
+        <li>Para cada funcionalidade, marque <b>Essencial</b> (sem isso o sistema não resolve o problema de vocês), <b>Desejável</b> (ajudaria, mas pode esperar uma fase seguinte) ou <b>Não preciso</b>.</li>
+        <li>Preencha as observações sempre que um item precisar de contexto extra — regras específicas, exceções, exemplos.</li>
+        <li>No fim da página, clique em <b>"Gerar Resumo"</b> para criar um texto com tudo que foi marcado — copie e envie de volta para a MUG (WhatsApp ou e-mail).</li>
+      </ul>
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:var(--ok);"></span>Essencial</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--warn);"></span>Desejável</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--off);"></span>Não preciso</span>
+    </div>
+
+    <div class="section">
+      <div class="section-eyebrow"><span class="section-num">00</span><span class="section-label">Contexto</span></div>
+      <h2 class="section-title">Sobre a operação hoje</h2>
+      <div class="context-grid">
+        <div class="cfield"><label>Nome de quem está preenchendo</label><input type="text" id="ctx_nome"></div>
+        <div class="cfield"><label>Cargo / função</label><input type="text" id="ctx_cargo"></div>
+        <div class="cfield"><label>Nº de bombeiros ativos hoje</label><input type="text" id="ctx_bombeiros"></div>
+        <div class="cfield"><label>Eventos por mês (média / pico)</label><input type="text" id="ctx_eventos"></div>
+        <div class="cfield"><label>Meta de crescimento (12 meses)</label><input type="text" id="ctx_crescimento"></div>
+        <div class="cfield"><label>Prazo desejado para o sistema completo</label><input type="text" id="ctx_prazo"></div>
+        <div class="cfield full"><label>Existe alguma data-limite (evento específico, início de temporada)?</label><input type="text" id="ctx_urgencia"></div>
+      </div>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="summary-box">
+      <h2>Gerar resumo para a MUG</h2>
+      <p>Depois de preencher tudo acima, clique para montar um resumo em texto com todas as respostas — é só copiar e mandar de volta pra gente.</p>
+      <div class="summary-actions">
+        <button class="btn btn--primary" id="btnGerar">Gerar Resumo</button>
+        <button class="btn btn--ghost" id="btnCopiar" style="display:none;">Copiar Resumo</button>
+      </div>
+      <textarea id="resumoOut" readonly></textarea>
+      <div class="copy-msg" id="copyMsg">✓ Copiado! Agora é só colar e enviar pra MUG.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="site-footer">
+  <span>MUG Solutions · Tecnologia, Soluções e Inovação · BH — MG</span>
+  <span><a href="mailto:contato@mugsolution.com.br">contato@mugsolution.com.br</a></span>
+  <span>PRD de Escopo · Brigada Camarão</span>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DATA = [
+    { title: "Bombeiros — Cadastro & Compliance", items: [
+      "Cadastro completo (dados pessoais, função, contato)",
+      "Anexo/upload de documentos (ASO, credenciamento, cursos)",
+      "Alerta automático de vencimento de documento",
+      "Bloqueio automático de escalação com documento vencido",
+      "Registro de disponibilidade (dias, horários, regiões)",
+      "Histórico de eventos por bombeiro",
+      "Múltiplas hierarquias/funções (líder, supervisor, socorrista, motorista)",
+      "Aplicativo mobile para o bombeiro (ver escala, confirmar presença)"
+    ]},
+    { title: "Clientes / Contratantes", items: [
+      "Cadastro de empresas contratantes (CNPJ, contato, endereço)",
+      "Tabela de preço fixa para clientes recorrentes",
+      "Histórico de eventos por cliente",
+      "Portal do cliente (acompanhar a própria escala)",
+      "Emissão de proposta/orçamento pelo sistema"
+    ]},
+    { title: "Eventos & Contratos", items: [
+      "Formulário próprio de solicitação de evento (sem depender de WhatsApp manual)",
+      "Fluxo de aprovação de orçamento antes do contrato fechar",
+      "Suporte a múltiplos turnos e múltiplos dias por evento",
+      "Registro de materiais/equipamentos por evento",
+      "Regras de cancelamento/remarcação (multa, reembolso)",
+      "Controle de estoque de materiais (validade, manutenção)"
+    ]},
+    { title: "Escala & Alocação", items: [
+      "Montagem manual da escala",
+      "Sugestão automática de escala (disponibilidade/proximidade)",
+      "Registro de ponto (horário cumprido)",
+      "Lista de reserva para substituição de última hora",
+      "Confirmação de escala pelo bombeiro via WhatsApp/app"
+    ]},
+    { title: "Precificação & Remuneração", items: [
+      "Régua de valores configurável por turno/tipo de evento",
+      "Cálculo de adicional noturno / hora extra / DSR",
+      "Valor de alimentação configurável por evento/cliente",
+      "Cálculo automático do valor cobrado do cliente (margem)"
+    ]},
+    { title: "Financeiro", items: [
+      "Cálculo automático de custo/lucro por evento",
+      "Contas a pagar (bombeiros) e a receber (cliente)",
+      "Emissão de nota fiscal/recibo",
+      "Controle de inadimplência/cobrança",
+      "Relatórios de DRE por evento, cliente ou período",
+      "Integração com sistema contábil/ERP"
+    ]},
+    { title: "Usuários & Permissões", items: [
+      "Múltiplos usuários com login individual",
+      "Permissões por papel (operação / financeiro / direção)",
+      "Log de auditoria (quem alterou o quê)"
+    ]},
+    { title: "Comunicação & Notificações", items: [
+      "Alertas automáticos (documento vencendo, escala incompleta, pagamento atrasado)",
+      "Notificação por e-mail",
+      "Notificação por WhatsApp (integração com WhatsApp Business API)",
+      "Notificações dentro do próprio sistema"
+    ]},
+    { title: "Relatórios & Indicadores", items: [
+      "Dashboard com indicadores em tempo real",
+      "Exportação de relatórios (Excel/PDF)",
+      "Comparativos por período (mês/trimestre/ano)"
+    ]},
+    { title: "Integrações & Migração de Dados", items: [
+      "Migração das planilhas atuais para o sistema novo",
+      "Integração com WhatsApp Business",
+      "Integração com sistema de folha de pagamento",
+      "Integração com ERP/contábil já usado"
+    ]}
+  ];
+
+  var OPTS = [
+    { value: "Essencial", cls: "opt-essencial" },
+    { value: "Desejável", cls: "opt-desejavel" },
+    { value: "Não preciso", cls: "opt-nao" }
+  ];
+
+  var container = document.getElementById("sections");
+  var html = "";
+
+  DATA.forEach(function (section, sIdx) {
+    var num = String(sIdx + 1).padStart(2, "0");
+    html += '<div class="section" id="sec' + sIdx + '">';
+    html += '<div class="section-eyebrow"><span class="section-num">' + num + '</span><span class="section-label">Módulo</span></div>';
+    html += '<h2 class="section-title">' + section.title + '</h2>';
+    html += '<div class="feat-table">';
+    section.items.forEach(function (item, iIdx) {
+      var name = "f_" + sIdx + "_" + iIdx;
+      html += '<div class="feat-row"><div class="feat-text">' + item + '</div><div class="feat-opts">';
+      OPTS.forEach(function (opt, oIdx) {
+        var id = name + "_" + oIdx;
+        html += '<label class="feat-opt"><input type="radio" name="' + name + '" id="' + id + '" value="' + opt.value + '"><span class="' + opt.cls + '">' + opt.value + '</span></label>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    html += '<div class="section-notes"><label for="notes_' + sIdx + '">Observações — ' + section.title + '</label>';
+    html += '<textarea id="notes_' + sIdx + '" placeholder="Contexto, exceções, exemplos..."></textarea></div>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+
+  document.getElementById("btnPrint").addEventListener("click", function () { window.print(); });
+
+  function val(id) {
+    var el = document.getElementById(id);
+    return el && el.value.trim() ? el.value.trim() : "—";
+  }
+
+  document.getElementById("btnGerar").addEventListener("click", function () {
+    var lines = [];
+    lines.push("RESUMO — PRD DE ESCOPO · BRIGADA CAMARÃO");
+    lines.push("=".repeat(48));
+    lines.push("Preenchido por: " + val("ctx_nome") + " (" + val("ctx_cargo") + ")");
+    lines.push("Bombeiros ativos hoje: " + val("ctx_bombeiros"));
+    lines.push("Eventos por mês (média/pico): " + val("ctx_eventos"));
+    lines.push("Meta de crescimento 12 meses: " + val("ctx_crescimento"));
+    lines.push("Prazo desejado: " + val("ctx_prazo"));
+    lines.push("Urgência/data-limite: " + val("ctx_urgencia"));
+    lines.push("");
+
+    var counts = { "Essencial": 0, "Desejável": 0, "Não preciso": 0, "Não respondido": 0 };
+
+    DATA.forEach(function (section, sIdx) {
+      lines.push("-".repeat(48));
+      lines.push(section.title.toUpperCase());
+      section.items.forEach(function (item, iIdx) {
+        var name = "f_" + sIdx + "_" + iIdx;
+        var checked = document.querySelector('input[name="' + name + '"]:checked');
+        var value = checked ? checked.value : "Não respondido";
+        counts[value] = (counts[value] || 0) + 1;
+        lines.push("  [" + value + "] " + item);
+      });
+      var notes = document.getElementById("notes_" + sIdx).value.trim();
+      if (notes) lines.push("  Obs: " + notes);
+      lines.push("");
+    });
+
+    lines.push("=".repeat(48));
+    lines.push("TOTAIS: " + counts["Essencial"] + " essenciais · " + counts["Desejável"] + " desejáveis · " +
+      counts["Não preciso"] + " não necessários · " + counts["Não respondido"] + " não respondidos");
+
+    var out = document.getElementById("resumoOut");
+    out.value = lines.join("\n");
+    out.style.display = "block";
+    document.getElementById("btnCopiar").style.display = "inline-block";
+    out.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  document.getElementById("btnCopiar").addEventListener("click", function () {
+    var out = document.getElementById("resumoOut");
+    out.select();
+    navigator.clipboard.writeText(out.value).then(function () {
+      var msg = document.getElementById("copyMsg");
+      msg.style.display = "block";
+      setTimeout(function () { msg.style.display = "none"; }, 3000);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
