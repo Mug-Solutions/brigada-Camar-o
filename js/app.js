@@ -1,72 +1,72 @@
 (function(){
   "use strict";
 
-  /* ===================== DATA ===================== */
+  /* ===================== DATA (fictícios — nenhum dado real do cliente) ===================== */
   var TODAY = new Date(2026,7,6); // 06/08/2026
 
   var FUNCOES = ["Bombeiro Civil","Bombeiro Civil Líder","Supervisora de Brigada"];
   var TURNOS = {
-    "Diurno":   {ini:"08:00", fim:"18:00", valor:130},
-    "Noturno":  {ini:"18:00", fim:"00:00", valor:118},
-    "Especial": {ini:"08:00", fim:"20:00", valor:245}
+    "Diurno":   {ini:"08:00", fim:"18:00", valor:150},
+    "Noturno":  {ini:"18:00", fim:"00:00", valor:135},
+    "Especial": {ini:"08:00", fim:"20:00", valor:280}
   };
-  var ALIMENTACAO_DIA = 18;
+  var ALIMENTACAO_DIA = 20;
 
   var seq = {b:11, e:6, s:100};
 
   var bombeiros = [
-    {id:"b1",  nome:"Rafael Nunes Cardoso",     cpf:"482.719.630-55", tel:"(31) 98811-2233", funcao:"Bombeiro Civil",         aso:"2026-09-15", esocial:"812", esocialStatus:"Ativo",  cred:"2026-12-10"},
-    {id:"b2",  nome:"Juliana Prates Oliveira",  cpf:"550.128.447-90", tel:"(31) 99022-1187", funcao:"Bombeiro Civil",         aso:"2026-08-20", esocial:"813", esocialStatus:"Ativo",  cred:"2027-01-02"},
-    {id:"b3",  nome:"Marcos Vinícius Teles",    cpf:"317.664.209-11", tel:"(31) 98456-7712", funcao:"Bombeiro Civil Líder",   aso:"2026-06-30", esocial:"814", esocialStatus:"Ativo",  cred:"2025-11-15"},
-    {id:"b4",  nome:"Fernanda Diniz Rocha",     cpf:"640.982.155-04", tel:"(31) 99123-4498", funcao:"Bombeiro Civil",         aso:"2026-10-10", esocial:"815", esocialStatus:"Ativo",  cred:"2026-08-18"},
-    {id:"b5",  nome:"Bruno Andrade Melo",       cpf:"205.377.891-66", tel:"(31) 98765-0021", funcao:"Bombeiro Civil",         aso:"2026-08-09", esocial:"816", esocialStatus:"Ativo",  cred:"2026-10-01"},
-    {id:"b6",  nome:"Camila Rezende Souza",     cpf:"719.043.582-37", tel:"(31) 99911-6654", funcao:"Supervisora de Brigada", aso:"2027-01-20", esocial:"817", esocialStatus:"Ativo",  cred:"2026-09-05"},
-    {id:"b7",  nome:"Diego Alves Barreto",      cpf:"138.256.470-82", tel:"(31) 98234-9911", funcao:"Bombeiro Civil",         aso:"2026-07-28", esocial:"818", esocialStatus:"Inativo",cred:"2026-12-01"},
-    {id:"b8",  nome:"Larissa Gomes Pinto",      cpf:"926.510.734-19", tel:"(31) 99345-2280", funcao:"Bombeiro Civil",         aso:"2026-11-11", esocial:"819", esocialStatus:"Ativo",  cred:"2027-02-14"},
-    {id:"b9",  nome:"Thiago Ferreira Lima",     cpf:"402.187.659-73", tel:"(31) 98567-3345", funcao:"Bombeiro Civil",         aso:"2026-08-25", esocial:"820", esocialStatus:"Ativo",  cred:"2026-08-15"},
-    {id:"b10", nome:"Patrícia Souza Martins",   cpf:"851.694.320-48", tel:"(31) 99456-8871", funcao:"Bombeiro Civil",         aso:"2026-09-30", esocial:"821", esocialStatus:"Ativo",  cred:"2026-06-20"}
+    {id:"b1",  nome:"Marina Costa Andrade",     cpf:"305.918.472-60", tel:"(31) 98123-4455", funcao:"Bombeiro Civil",         aso:"2026-09-15", esocial:"812", esocialStatus:"Ativo",  cred:"2026-12-10"},
+    {id:"b2",  nome:"Eduardo Lima Souza",       cpf:"274.836.109-92", tel:"(31) 99234-5566", funcao:"Bombeiro Civil",         aso:"2026-08-20", esocial:"813", esocialStatus:"Ativo",  cred:"2027-01-02"},
+    {id:"b3",  nome:"Vinícius Almeida Rocha",   cpf:"618.204.957-31", tel:"(31) 98345-6677", funcao:"Bombeiro Civil Líder",   aso:"2026-06-30", esocial:"814", esocialStatus:"Ativo",  cred:"2025-11-15"},
+    {id:"b4",  nome:"Beatriz Fernandes Melo",   cpf:"452.170.836-08", tel:"(31) 99456-7788", funcao:"Bombeiro Civil",         aso:"2026-10-10", esocial:"815", esocialStatus:"Ativo",  cred:"2026-08-18"},
+    {id:"b5",  nome:"Rodrigo Santos Pereira",   cpf:"793.615.240-77", tel:"(31) 98567-8899", funcao:"Bombeiro Civil",         aso:"2026-08-09", esocial:"816", esocialStatus:"Ativo",  cred:"2026-10-01"},
+    {id:"b6",  nome:"Isabela Martins Duarte",   cpf:"936.482.017-53", tel:"(31) 99678-9900", funcao:"Supervisora de Brigada", aso:"2027-01-20", esocial:"817", esocialStatus:"Ativo",  cred:"2026-09-05"},
+    {id:"b7",  nome:"Gustavo Ribeiro Nunes",    cpf:"205.749.638-14", tel:"(31) 98789-0011", funcao:"Bombeiro Civil",         aso:"2026-07-28", esocial:"818", esocialStatus:"Inativo",cred:"2026-12-01"},
+    {id:"b8",  nome:"Carolina Vieira Barros",   cpf:"861.023.594-29", tel:"(31) 99890-1122", funcao:"Bombeiro Civil",         aso:"2026-11-11", esocial:"819", esocialStatus:"Ativo",  cred:"2027-02-14"},
+    {id:"b9",  nome:"Felipe Moraes Cardozo",    cpf:"347.596.281-65", tel:"(31) 98901-2233", funcao:"Bombeiro Civil",         aso:"2026-08-25", esocial:"820", esocialStatus:"Ativo",  cred:"2026-08-15"},
+    {id:"b10", nome:"Renata Oliveira Castro",   cpf:"570.842.163-90", tel:"(31) 99012-3344", funcao:"Bombeiro Civil",         aso:"2026-09-30", esocial:"821", esocialStatus:"Ativo",  cred:"2026-06-20"}
   ];
 
   var eventos = [
-    {id:"ev1", nome:"Circuito Sabor & Arte BH", cliente:"Grupo Vertex Eventos", local:"Praça da Estação — Belo Horizonte", inicio:"2026-08-01", fim:"2026-08-03", qtd:8,  materiais:"12 extintores de incêndio, 1 DEA, kit de primeiros socorros", valorFechamento:9600,  status:"Concluído"},
-    {id:"ev2", nome:"Festival Raízes do Cerrado", cliente:"Cultura Viva Produções", local:"Parque Ecológico — Betim", inicio:"2026-08-15", fim:"2026-08-15", qtd:16, materiais:"20 extintores, 2 cadeiras de rodas, sinalização de rota de fuga", valorFechamento:14200, status:"Confirmado"},
-    {id:"ev3", nome:"Arena MRV — Atlético x Cruzeiro", cliente:"Arena Independência Operações", local:"Arena MRV — Belo Horizonte", inicio:"2026-08-22", fim:"2026-08-22", qtd:40, materiais:"40 extintores, 2 DEA, brigada volante", valorFechamento:33600, status:"Confirmado"},
-    {id:"ev4", nome:"Feira Biocor Saúde", cliente:"Instituto Biocor", local:"Nova Lima", inicio:"2026-08-29", fim:"2026-08-29", qtd:6, materiais:"8 extintores, kit de primeiros socorros", valorFechamento:4800, status:"Confirmado"},
-    {id:"ev5", nome:"Corrida Noturna Savassi", cliente:"RunLife Assessoria Esportiva", local:"Praça da Savassi — Belo Horizonte", inicio:"2026-09-05", fim:"2026-09-05", qtd:10, materiais:"10 extintores, ambulância de apoio (terceirizada)", valorFechamento:7400, status:"Planejamento"}
+    {id:"ev1", nome:"Feira de Negócios Vale do Aço", cliente:"Prisma Eventos & Produções", local:"Centro de Convenções — Belo Horizonte", inicio:"2026-08-01", fim:"2026-08-03", qtd:8,  materiais:"10 extintores de incêndio, 1 DEA, kit de primeiros socorros", valorFechamento:8200,  status:"Concluído"},
+    {id:"ev2", nome:"Festival Horizonte Sonoro", cliente:"Onda Cultural Produções", local:"Parque Municipal — Contagem", inicio:"2026-08-15", fim:"2026-08-15", qtd:14, materiais:"18 extintores, 2 cadeiras de rodas, sinalização de rota de fuga", valorFechamento:12600, status:"Confirmado"},
+    {id:"ev3", nome:"Copa Regional de Futebol — Final", cliente:"Liga Esportiva Mineira", local:"Estádio Municipal — Betim", inicio:"2026-08-22", fim:"2026-08-22", qtd:30, materiais:"30 extintores, 2 DEA, brigada volante", valorFechamento:27800, status:"Confirmado"},
+    {id:"ev4", nome:"Feira de Saúde e Bem-Estar", cliente:"Grupo Vitalis Saúde", local:"Shopping — Nova Lima", inicio:"2026-08-29", fim:"2026-08-29", qtd:6, materiais:"8 extintores, kit de primeiros socorros", valorFechamento:4300, status:"Confirmado"},
+    {id:"ev5", nome:"Corrida Solidária de Verão", cliente:"Ativa Assessoria Esportiva", local:"Praça da Liberdade — Belo Horizonte", inicio:"2026-09-05", fim:"2026-09-05", qtd:10, materiais:"10 extintores, ambulância de apoio (terceirizada)", valorFechamento:6900, status:"Planejamento"}
   ];
 
   var escalas = [
-    {id:"s1",eventoId:"ev1",data:"2026-08-01",turno:"Diurno",bombeiroId:"b1",cumprido:"08:02–18:00",valor:130},
-    {id:"s2",eventoId:"ev1",data:"2026-08-01",turno:"Diurno",bombeiroId:"b4",cumprido:"07:57–18:05",valor:130},
-    {id:"s3",eventoId:"ev1",data:"2026-08-01",turno:"Noturno",bombeiroId:"b2",cumprido:"18:00–23:50",valor:118},
-    {id:"s4",eventoId:"ev1",data:"2026-08-02",turno:"Diurno",bombeiroId:"b1",cumprido:"08:00–18:00",valor:130},
-    {id:"s5",eventoId:"ev1",data:"2026-08-02",turno:"Noturno",bombeiroId:"b5",cumprido:"18:10–00:00",valor:118},
-    {id:"s6",eventoId:"ev1",data:"2026-08-02",turno:"Noturno",bombeiroId:"b9",cumprido:"18:00–00:03",valor:118},
-    {id:"s7",eventoId:"ev1",data:"2026-08-03",turno:"Diurno",bombeiroId:"b4",cumprido:"08:00–17:55",valor:130},
-    {id:"s8",eventoId:"ev1",data:"2026-08-03",turno:"Diurno",bombeiroId:"b8",cumprido:"08:05–18:00",valor:130},
-    {id:"s9",eventoId:"ev1",data:"2026-08-03",turno:"Especial",bombeiroId:"b6",cumprido:"08:00–20:10",valor:245},
+    {id:"s1",eventoId:"ev1",data:"2026-08-01",turno:"Diurno",bombeiroId:"b1",cumprido:"08:02–18:00",valor:150},
+    {id:"s2",eventoId:"ev1",data:"2026-08-01",turno:"Diurno",bombeiroId:"b4",cumprido:"07:57–18:05",valor:150},
+    {id:"s3",eventoId:"ev1",data:"2026-08-01",turno:"Noturno",bombeiroId:"b2",cumprido:"18:00–23:50",valor:135},
+    {id:"s4",eventoId:"ev1",data:"2026-08-02",turno:"Diurno",bombeiroId:"b1",cumprido:"08:00–18:00",valor:150},
+    {id:"s5",eventoId:"ev1",data:"2026-08-02",turno:"Noturno",bombeiroId:"b5",cumprido:"18:10–00:00",valor:135},
+    {id:"s6",eventoId:"ev1",data:"2026-08-02",turno:"Noturno",bombeiroId:"b9",cumprido:"18:00–00:03",valor:135},
+    {id:"s7",eventoId:"ev1",data:"2026-08-03",turno:"Diurno",bombeiroId:"b4",cumprido:"08:00–17:55",valor:150},
+    {id:"s8",eventoId:"ev1",data:"2026-08-03",turno:"Diurno",bombeiroId:"b8",cumprido:"08:05–18:00",valor:150},
+    {id:"s9",eventoId:"ev1",data:"2026-08-03",turno:"Especial",bombeiroId:"b6",cumprido:"08:00–20:10",valor:280},
 
-    {id:"s10",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b2",cumprido:"—",valor:118},
-    {id:"s11",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b5",cumprido:"—",valor:118},
-    {id:"s12",eventoId:"ev2",data:"2026-08-15",turno:"Especial",bombeiroId:"b6",cumprido:"—",valor:245},
-    {id:"s13",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b9",cumprido:"—",valor:118},
-    {id:"s14",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b10",cumprido:"—",valor:118},
+    {id:"s10",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b2",cumprido:"—",valor:135},
+    {id:"s11",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b5",cumprido:"—",valor:135},
+    {id:"s12",eventoId:"ev2",data:"2026-08-15",turno:"Especial",bombeiroId:"b6",cumprido:"—",valor:280},
+    {id:"s13",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b9",cumprido:"—",valor:135},
+    {id:"s14",eventoId:"ev2",data:"2026-08-15",turno:"Noturno",bombeiroId:"b10",cumprido:"—",valor:135},
 
-    {id:"s15",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b1",cumprido:"—",valor:130},
-    {id:"s16",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b2",cumprido:"—",valor:130},
-    {id:"s17",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b4",cumprido:"—",valor:130},
-    {id:"s18",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b5",cumprido:"—",valor:130},
-    {id:"s19",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b6",cumprido:"—",valor:130},
-    {id:"s20",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b8",cumprido:"—",valor:130},
-    {id:"s21",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b9",cumprido:"—",valor:130},
-    {id:"s22",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b10",cumprido:"—",valor:130},
+    {id:"s15",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b1",cumprido:"—",valor:150},
+    {id:"s16",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b2",cumprido:"—",valor:150},
+    {id:"s17",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b4",cumprido:"—",valor:150},
+    {id:"s18",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b5",cumprido:"—",valor:150},
+    {id:"s19",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b6",cumprido:"—",valor:150},
+    {id:"s20",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b8",cumprido:"—",valor:150},
+    {id:"s21",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b9",cumprido:"—",valor:150},
+    {id:"s22",eventoId:"ev3",data:"2026-08-22",turno:"Diurno",bombeiroId:"b10",cumprido:"—",valor:150},
 
-    {id:"s23",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b1",cumprido:"—",valor:130},
-    {id:"s24",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b2",cumprido:"—",valor:130},
-    {id:"s25",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b4",cumprido:"—",valor:130},
-    {id:"s26",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b5",cumprido:"—",valor:130},
-    {id:"s27",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b6",cumprido:"—",valor:130},
-    {id:"s28",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b8",cumprido:"—",valor:130}
+    {id:"s23",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b1",cumprido:"—",valor:150},
+    {id:"s24",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b2",cumprido:"—",valor:150},
+    {id:"s25",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b4",cumprido:"—",valor:150},
+    {id:"s26",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b5",cumprido:"—",valor:150},
+    {id:"s27",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b6",cumprido:"—",valor:150},
+    {id:"s28",eventoId:"ev4",data:"2026-08-29",turno:"Diurno",bombeiroId:"b8",cumprido:"—",valor:150}
   ];
 
   var financeiroExtra = {

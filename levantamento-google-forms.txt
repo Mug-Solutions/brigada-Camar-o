@@ -22,7 +22,7 @@ Existem outras funções/hierarquias além de "Bombeiro Civil" e "Líder" (ex: s
 
 === SEÇÃO 3 — CLIENTES / CONTRATANTES ===
 Quais dados vocês precisam guardar de cada empresa contratante (CNPJ, contato responsável, endereço, forma de pagamento)?
-Clientes recorrentes (como Arena MRV, Biocor) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?
+Clientes recorrentes (grandes contas fixas) têm uma tabela de preço fixa combinada, ou cada evento é negociado do zero?
 Faz sentido o cliente ter algum tipo de acesso para acompanhar a escala do próprio evento, ou isso é só interno?
 
 === SEÇÃO 4 — EVENTOS E CONTRATOS ===
