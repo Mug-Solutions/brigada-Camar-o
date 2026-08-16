@@ -214,9 +214,10 @@
 
     <div class="summary-box">
       <h2>Gerar resumo para a MUG</h2>
-      <p>Depois de preencher tudo acima, clique para montar um resumo em texto com todas as respostas — é só copiar e mandar de volta pra gente.</p>
+      <p>Depois de preencher tudo acima, clique para montar um resumo com todas as respostas. Baixe o documento e mande de volta pra gente (e-mail ou WhatsApp), ou copie e cole direto na mensagem.</p>
       <div class="summary-actions">
         <button class="btn btn--primary" id="btnGerar">Gerar Resumo</button>
+        <button class="btn btn--ghost" id="btnBaixar" style="display:none;">↓ Baixar Documento</button>
         <button class="btn btn--ghost" id="btnCopiar" style="display:none;">Copiar Resumo</button>
       </div>
       <textarea id="resumoOut" readonly></textarea>
@@ -397,8 +398,23 @@
     var out = document.getElementById("resumoOut");
     out.value = lines.join("\n");
     out.style.display = "block";
+    document.getElementById("btnBaixar").style.display = "inline-block";
     document.getElementById("btnCopiar").style.display = "inline-block";
     out.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  document.getElementById("btnBaixar").addEventListener("click", function () {
+    var out = document.getElementById("resumoOut");
+    var blob = new Blob([out.value], { type: "text/plain;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var hoje = new Date().toISOString().slice(0, 10);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "brigada-camarao-escopo-respondido-" + hoje + ".txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   });
 
   document.getElementById("btnCopiar").addEventListener("click", function () {
