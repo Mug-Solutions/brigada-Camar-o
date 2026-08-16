@@ -200,6 +200,18 @@
 
     <div id="sections"></div>
 
+    <div class="section" id="secExtra">
+      <div class="section-eyebrow"><span class="section-num">12</span><span class="section-label">Campo Aberto</span></div>
+      <h2 class="section-title">O que a gente não perguntou, mas não pode faltar?</h2>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;max-width:70ch;">
+        Se tem algo essencial para a operação de vocês que não apareceu em nenhuma pergunta
+        acima — uma regra específica, uma situação do dia a dia, uma funcionalidade que a gente
+        ainda não cobriu — descreva livremente aqui. É melhor sobrar do que faltar.
+      </p>
+      <textarea id="ctx_extra" placeholder="Descreva aqui o que não pode faltar no sistema..."
+        style="width:100%;min-height:150px;border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:13.5px;color:var(--text);background:var(--light);resize:vertical;"></textarea>
+    </div>
+
     <div class="summary-box">
       <h2>Gerar resumo para a MUG</h2>
       <p>Depois de preencher tudo acima, clique para montar um resumo em texto com todas as respostas — é só copiar e mandar de volta pra gente.</p>
@@ -372,6 +384,11 @@
       if (notes) lines.push("  Obs: " + notes);
       lines.push("");
     });
+
+    lines.push("-".repeat(48));
+    lines.push("O QUE NÃO PODE FALTAR (CAMPO ABERTO)");
+    lines.push("  " + val("ctx_extra"));
+    lines.push("");
 
     lines.push("=".repeat(48));
     lines.push("TOTAIS: " + counts["Essencial"] + " essenciais · " + counts["Desejável"] + " desejáveis · " +
