@@ -1,0 +1,24 @@
+# Reduz o contexto enviado ao daemon do Docker e evita que segredo
+# nenhum entre na imagem por engano.
+node_modules
+.next
+.git
+coverage
+
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+*.tsbuildinfo
+
+.vscode
+.DS_Store
+
+Dockerfile
+.dockerignore
+README.md
+
+# Migrações são aplicadas direto no Supabase (SQL editor/CLI), nunca
+# rodadas de dentro do container — não precisam estar na imagem.
+supabase
