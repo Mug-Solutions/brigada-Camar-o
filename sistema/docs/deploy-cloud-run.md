@@ -67,9 +67,12 @@ gcloud run deploy brigada-camarao \
   --image southamerica-east1-docker.pkg.dev/SEU_PROJETO/brigada-camarao/sistema \
   --region southamerica-east1 \
   --allow-unauthenticated \
-  --set-env-vars NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co,NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_ANON_KEY,SUPABASE_URL=https://SEU-PROJETO.supabase.co,SITE_URL=https://SEU-DOMINIO-FINAL \
+  --set-env-vars NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co,NEXT_PUBLIC_SUPABASE_ANON_KEY=SUA_ANON_KEY,SUPABASE_URL=https://SEU-PROJETO.supabase.co,SITE_URL=https://SEU-DOMINIO-FINAL,EMAIL_FROM="Brigada Camarão <alertas@seudominio.com.br>" \
   --set-secrets SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY:latest,RESEND_API_KEY=RESEND_API_KEY:latest,CRON_SECRET=CRON_SECRET:latest
 ```
+
+`EMAIL_FROM` só faz sentido depois do passo 8 (domínio verificado no Resend) —
+até lá, pode omitir essa variável sem quebrar nada (ver seção 8).
 
 `--allow-unauthenticated` é necessário — este é um sistema com login próprio
 (Supabase Auth), não autenticação do Google Cloud; sem essa flag, o Cloud Run
@@ -109,6 +112,39 @@ deploy:
 - **Redirect URLs**: adicione `https://SUA-URL-DO-CLOUD-RUN/convite` — sem isso,
   o link de convite por e-mail continua caindo em `localhost`, mesmo achado real
   documentado em `docs/decisoes-tecnicas.md` (seção sobre `SiteURL`/`RedirectTo`).
+
+## 8. E-mail: dois caminhos separados, cada um com seu ajuste
+
+O sistema manda e-mail por dois caminhos independentes — não é uma configuração
+só:
+
+**a) E-mail de autenticação (convite do bombeiro, ex.: "defina sua senha")** —
+sai pelo SMTP configurado no painel do Supabase (Authentication → Emails →
+SMTP Settings, já apontando pro Resend). O ajuste necessário é só o que já está
+no passo 7 acima: `SITE_URL` do app + Site URL/Redirect URLs do Supabase
+apontando pro domínio público real. Sem isso, o link do convite continua vindo
+com `localhost` mesmo com o app já hospedado (era exatamente esse o bug que a
+cliente pediu pra só validar depois de hospedado — ver
+`docs/decisoes-tecnicas.md`).
+
+**b) E-mail de negócio (alerta de documento vencendo, disparado pelo job
+diário)** — sai direto pela API do Resend (`src/lib/email/enviar.ts`), **sem
+passar pelo SMTP do Supabase**. Hoje usa o domínio de sandbox do Resend
+(`onboarding@resend.dev`) por padrão, que só entrega de forma confiável pro
+próprio dono da conta Resend — não serve pra mandar e-mail de verdade pra
+bombeiro em produção. Antes de ativar o job em produção:
+
+1. Verifique um domínio próprio em [resend.com/domains](https://resend.com/domains)
+   — adiciona registros SPF, DKIM e (recomendado) DMARC no DNS do domínio
+   público que a Brigada Camarão vai usar. Costuma levar de minutos a algumas
+   horas pra propagar.
+2. Defina a variável `EMAIL_FROM` (ver `.env.example`) com um remetente desse
+   domínio, ex.: `EMAIL_FROM="Brigada Camarão <alertas@seudominio.com.br>"`.
+3. Redeploy.
+
+Sem o passo 2, o job continua funcionando (cria as notificações in-app
+normalmente) — só o e-mail em si não sai, fica logado como erro no servidor,
+não quebra nada silenciosamente.
 
 ## Domínio customizado (opcional)
 

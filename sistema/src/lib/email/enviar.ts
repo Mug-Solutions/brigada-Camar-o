@@ -33,9 +33,13 @@ export async function enviarEmail(params: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // TODO: trocar pelo domínio verificado assim que existir
-        // (mesmo domínio configurado no SMTP do Supabase Auth).
-        from: "Brigada Camarão <onboarding@resend.dev>",
+        // Domínio de sandbox do Resend por padrão — só entrega de
+        // forma confiável pro próprio dono da conta Resend, não serve
+        // pra mandar e-mail de verdade pra bombeiro/cliente em
+        // produção. EMAIL_FROM assume assim que houver um domínio
+        // próprio verificado no Resend (registros SPF/DKIM/DMARC no
+        // DNS do domínio público — ver docs/deploy-cloud-run.md).
+        from: process.env.EMAIL_FROM ?? "Brigada Camarão <onboarding@resend.dev>",
         to: params.to,
         subject: params.subject,
         html: params.html,
