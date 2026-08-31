@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manual do Sistema — Brigada Camarão · MUG Solutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #4444BB;
+    --purple-dark: #2e2e8a;
+    --purple-light: #6868cc;
+    --purple-bg: #f0f0fa;
+    --purple-border: #d0d0ef;
+    --dark: #1a1a2e;
+    --text: #2d2d3a;
+    --muted: #7070a0;
+    --light: #f8f8fd;
+    --white: #ffffff;
+    --border: #e2e2f0;
+    --ok: #1a7a4a; --ok-bg: #f0faf4; --ok-border: #b8e8cc;
+    --warn: #a2740a; --warn-bg: #fbf3df; --warn-border: #ecd9a4;
+    --off: #b23324; --off-bg: #fbeae8; --off-border: #f0c4bd;
+  }
+
+  body { font-family: 'Inter', sans-serif; background: #eeeef8; color: var(--text); font-size: 14px; line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  :focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+  code, .mono { font-family: 'JetBrains Mono', 'Consolas', monospace; }
+
+  .logo-name.white { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: white; letter-spacing: -0.01em; line-height: 1; }
+  .logo-tag.white { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-top: 3px; }
+
+  .banner { background: var(--purple-dark); position: relative; overflow: hidden; }
+  .banner-deco-1 { position: absolute; top: -160px; right: -160px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(100,100,220,0.35) 0%, transparent 70%); pointer-events: none; }
+  .banner-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; position: relative; z-index: 2; }
+  .banner-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 20px; }
+  .banner-body { padding: 8px 48px 36px; position: relative; z-index: 2; max-width: 780px; }
+  .banner-for { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 14px; margin-bottom: 18px; }
+  .banner-for-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  .banner-for-value { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .banner-for-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); }
+  .banner-title { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.15; color: white; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .banner-desc { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 600px; line-height: 1.7; font-weight: 300; }
+
+  .layout { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 240px 1fr; gap: 0; background: var(--white); }
+
+  .sidenav { border-right: 1px solid var(--border); padding: 32px 20px; position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; }
+  .sidenav b { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: block; margin: 18px 0 8px; }
+  .sidenav b:first-child { margin-top: 0; }
+  .sidenav a { display: block; font-size: 12.5px; color: var(--text); text-decoration: none; padding: 6px 10px; border-radius: 6px; margin-bottom: 1px; }
+  .sidenav a:hover { background: var(--purple-bg); color: var(--purple); }
+
+  .content { padding: 44px 56px 60px; min-width: 0; }
+
+  .status-legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); background: var(--light); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px 5px 8px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  .module { margin-bottom: 56px; scroll-margin-top: 20px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .module:first-child { border-top: none; padding-top: 0; }
+  .module-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .module-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple); }
+  .module-title { font-family: 'Outfit', sans-serif; font-size: 23px; font-weight: 600; color: var(--dark); letter-spacing: -0.01em; margin: 4px 0 10px; }
+  .module-who { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .module-who b { color: var(--purple-dark); }
+  .status-pill { font-size: 10.5px; font-weight: 700; padding: 4px 11px; border-radius: 20px; border: 1px solid; white-space: nowrap; }
+  .status-pill--build { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .status-pill--plan { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+  .status-pill--future { background: var(--off-bg); border-color: var(--off-border); color: var(--off); }
+
+  .feature-list { list-style: none; margin: 14px 0 18px; }
+  .feature-list li { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.3px; }
+  .feature-list li:last-child { border-bottom: none; }
+  .feature-list .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); margin-top: 7px; flex-shrink: 0; }
+  .feature-list b { color: var(--dark); }
+
+  .flow-box { background: var(--light); border: 1px solid var(--border); border-left: 3px solid var(--purple); border-radius: 8px; padding: 16px 20px; margin: 14px 0; }
+  .flow-box b.flow-label { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--purple); margin-bottom: 8px; }
+  .flow-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; }
+  .flow-step { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text); }
+  .flow-arrow { color: var(--purple-light); font-weight: 700; }
+
+  .rule-box { background: var(--off-bg); border: 1px solid var(--off-border); border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 12.5px; color: #7a2318; }
+  .rule-box b { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; color: var(--off); }
+
+  .tip-box { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-size: 12.5px; color: #2e2e6a; }
+  .tip-box b { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; color: var(--purple); }
+
+  table.field-table { width: 100%; border-collapse: collapse; font-size: 12.3px; margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  table.field-table th { background: var(--dark); color: white; text-align: left; padding: 8px 12px; font-weight: 600; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  table.field-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  table.field-table tr:last-child td { border-bottom: none; }
+  table.field-table tr:nth-child(even) td { background: var(--light); }
+
+  .faq-item { margin-bottom: 16px; }
+  .faq-q { font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+  .faq-a { font-size: 13px; color: var(--muted); }
+
+  .glossary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+  .glossary-item { font-size: 12.5px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .glossary-item b { color: var(--dark); }
+
+  .site-footer { background: var(--dark); color: rgba(255,255,255,0.4); display: flex; justify-content: space-between; align-items: center; padding: 20px 56px; font-size: 11.5px; max-width: 1180px; margin: 0 auto; flex-wrap: wrap; gap: 6px; }
+
+  .print-btn { position: fixed; top: 20px; right: 20px; z-index: 10; background: var(--purple); color: white; border: none; border-radius: 7px; padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 10px 24px -10px rgba(46,46,138,0.5); }
+
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidenav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .content { padding: 32px 24px; }
+    .glossary-grid { grid-template-columns: 1fr; }
+    .print-btn { display: none; }
+  }
+  @media print {
+    .sidenav, .print-btn { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ Exportar PDF</button>
+
+<div class="banner">
+  <div class="banner-deco-1"></div>
+  <div class="banner-nav">
+    <div>
+      <div class="logo-name white">MUG SOLUTIONS</div>
+      <div class="logo-tag white">Ferramentas Digitais B2B</div>
+    </div>
+    <div class="banner-badge">MANUAL DO SISTEMA</div>
+  </div>
+  <div class="banner-body">
+    <div class="banner-for">
+      <span class="banner-for-label">Cliente</span>
+      <span class="banner-for-dot"></span>
+      <span class="banner-for-value">Brigada Camarão</span>
+    </div>
+    <div class="banner-title">Manual do Sistema de Gestão</div>
+    <div class="banner-desc">Guia funcional módulo a módulo: o que cada área do sistema faz, quem pode usar e como as regras de negócio do PRD de escopo são aplicadas. Serve tanto de referência para a equipe quanto de especificação para a construção.</div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidenav">
+    <b>Início</b>
+    <a href="#intro">Introdução e perfis</a>
+    <b>Módulos</b>
+    <a href="#compliance">Bombeiros &amp; Compliance</a>
+    <a href="#portal">Portal do Bombeiro</a>
+    <a href="#clientes">Clientes / Contratantes</a>
+    <a href="#eventos">Eventos &amp; Contratos</a>
+    <a href="#escala">Escala &amp; Alocação</a>
+    <a href="#precos">Precificação &amp; Remuneração</a>
+    <a href="#financeiro">Financeiro</a>
+    <a href="#usuarios">Usuários &amp; Permissões</a>
+    <a href="#comunicacao">Comunicação &amp; Notificações</a>
+    <a href="#relatorios">Relatórios &amp; Indicadores</a>
+    <a href="#integracoes">Integrações &amp; Migração</a>
+    <b>Referência</b>
+    <a href="#faq">Perguntas frequentes</a>
+    <a href="#glossario">Glossário</a>
+  </nav>
+
+  <main class="content">
+
+    <div class="status-legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--ok)"></span> Em construção agora (protótipo)</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--warn)"></span> Planejado — próximas fases</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--off)"></span> Desejável — pós-lançamento</div>
+    </div>
+
+    <div class="module" id="intro">
+      <div class="module-eyebrow">Início</div>
+      <div class="module-title">Introdução</div>
+      <p style="font-size:13.5px;color:var(--muted);max-width:74ch;margin-bottom:14px">Este sistema organiza toda a operação da Brigada Camarão: o quadro de bombeiros civis e seus documentos obrigatórios, os clientes que contratam eventos, a montagem de escala, a execução e o fechamento financeiro de cada evento. Ele substitui o controle atual por planilhas e WhatsApp manual.</p>
+      <p style="font-size:13.5px;color:var(--muted);max-width:74ch;margin-bottom:14px">Quatro perfis de acesso usam o sistema todos os dias:</p>
+      <table class="field-table">
+        <tr><th>Perfil</th><th>O que faz no sistema</th></tr>
+        <tr><td><b>Direção</b></td><td>Acompanha indicadores gerais, aprova propostas de maior valor, tem visão de tudo.</td></tr>
+        <tr><td><b>Operação / Coordenação</b></td><td>Cadastra bombeiros e clientes, monta escalas, aprova cadastros e candidaturas do Portal do Bombeiro.</td></tr>
+        <tr><td><b>Financeiro</b></td><td>Fecha o financeiro de cada evento, emite NF, controla cobrança e gera a folha de pagamento.</td></tr>
+        <tr><td><b>Bombeiro</b></td><td>Usa só o Portal do Bombeiro: mantém seu cadastro/documentos e acompanha sua escala.</td></tr>
+      </table>
+      <div class="tip-box"><b>Como ler este manual</b>Cada módulo abaixo corresponde a uma seção do PRD de escopo respondido pelo cliente. O selo colorido ao lado do título mostra em que fase do <a href="arquitetura-sistema.html">plano de construção</a> aquele módulo entra.</div>
+    </div>
+
+    <!-- COMPLIANCE -->
+    <div class="module" id="compliance">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Bombeiros &amp; Compliance</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 1 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: <b>Operação/Coordenação</b> (cadastra e gerencia) · <b>Bombeiro</b> (mantém seus próprios documentos, via Portal)</div>
+      <p style="font-size:13.3px;margin-bottom:6px">Mantém o quadro de bombeiros civis sempre apto a trabalhar: cadastro completo, documentos obrigatórios anexados e nunca vencidos sem que alguém saiba.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Cadastro completo</b> — dados pessoais, função, contato, endereço.</span></li>
+        <li><span class="dot"></span><span><b>Documentos obrigatórios</b> — anexo de ASO, credenciamento e cursos, cada um com data de emissão e vencimento.</span></li>
+        <li><span class="dot"></span><span><b>Alerta automático de vencimento</b> — o sistema avisa a coordenação e o próprio bombeiro antes do documento vencer.</span></li>
+        <li><span class="dot"></span><span><b>Múltiplas hierarquias/funções</b> — um bombeiro pode acumular papéis (ex.: líder + socorrista).</span></li>
+      </ul>
+      <div class="rule-box"><b>Regra crítica</b>Bombeiro com documento vencido não aparece como opção ao montar uma escala. Isso é um bloqueio automático do sistema, não um aviso que pode ser ignorado.</div>
+      <div class="flow-box">
+        <b class="flow-label">Fluxo — vencimento de documento</b>
+        <div class="flow-steps">
+          <div class="flow-step">Job diário verifica vencimentos</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Alerta 30/15/7 dias antes</div><span class="flow-arrow">→</span>
+          <div class="flow-step">WhatsApp + e-mail + in-app</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Se vencer: bombeiro bloqueado p/ escala</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PORTAL -->
+    <div class="module" id="portal">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Portal do Bombeiro</div>
+        </div>
+        <span class="status-pill status-pill--plan">Fase 2 — planejado</span>
+      </div>
+      <div class="module-who">Usado por: <b>Bombeiro</b> (acesso próprio, app/PWA) · <b>Operação</b> (aprova cadastros e candidaturas)</div>
+      <p style="font-size:13.3px;margin-bottom:6px">Acesso individual do bombeiro ao próprio cadastro, escala e histórico — reduz o trabalho manual da coordenação de manter tudo atualizado por WhatsApp.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Login e autocadastro</b> — o bombeiro cria conta e preenche seus próprios dados, documentos e chave PIX.</span></li>
+        <li><span class="dot"></span><span><b>Aprovação da coordenação</b> — nenhum autocadastro libera acesso à escala sem revisão manual antes.</span></li>
+        <li><span class="dot"></span><span><b>Escala e histórico</b> — o bombeiro vê sua escala confirmada e o histórico de eventos em que atuou.</span></li>
+        <li><span class="dot"></span><span><b>Atualização de documentos</b> — quando um documento vence, o próprio bombeiro reenvia pelo app, sem depender da coordenação.</span></li>
+        <li><span class="dot"></span><span><b>App mobile</b> — instalável no celular (PWA), não depende de acessar pelo navegador do computador.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Candidatura a eventos em aberto</b> <i>(desejável)</i> — o bombeiro visualiza vagas e se candidata, em vez de só ser escalado.</span></li>
+      </ul>
+      <div class="flow-box">
+        <b class="flow-label">Fluxo — autocadastro</b>
+        <div class="flow-steps">
+          <div class="flow-step">Bombeiro cria login</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Preenche dados + documentos + PIX</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Fica "pendente de aprovação"</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Coordenação aprova</div><span class="flow-arrow">→</span>
+          <div class="flow-step">Liberado para escala</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="module" id="clientes">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Clientes / Contratantes</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 1 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: <b>Operação</b> (cadastra) · <b>Direção</b> (visão geral)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Cadastro de empresas contratantes</b> — CNPJ, contato, endereço.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Histórico de eventos por cliente</b> <i>(desejável)</i> — quantos eventos, valor total, recorrência.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Emissão de proposta/orçamento pelo sistema</b> <i>(desejável)</i> — antes de virar evento fechado.</span></li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted)">Fora de escopo por decisão do cliente: tabela de preço fixa por cliente recorrente e portal de acompanhamento para o cliente.</p>
+    </div>
+
+    <!-- EVENTOS -->
+    <div class="module" id="eventos">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Eventos &amp; Contratos</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 1 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: <b>Operação</b> (cria e acompanha) · <b>Direção</b> (aprova orçamento)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Fluxo de aprovação de orçamento</b> — todo evento passa por aprovação antes do contrato fechar.</span></li>
+        <li><span class="dot"></span><span><b>Múltiplos turnos e múltiplos dias</b> — um evento pode ter vários turnos em vários dias, cada um com sua própria escala.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Registro de materiais/equipamentos</b> <i>(desejável)</i> por evento.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Controle de estoque</b> <i>(desejável)</i> — validade e manutenção de materiais.</span></li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted)">Fora de escopo por decisão do cliente: formulário próprio de solicitação (continua entrando por WhatsApp) e regras automáticas de cancelamento/remarcação.</p>
+    </div>
+
+    <!-- ESCALA -->
+    <div class="module" id="escala">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Escala &amp; Alocação</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 1 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: <b>Operação</b> (monta a escala) · <b>Bombeiro</b> (confirma presença)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Montagem manual da escala</b> — a coordenação aloca bombeiros por turno/evento.</span></li>
+        <li><span class="dot"></span><span><b>Registro de ponto</b> — horário efetivamente cumprido em cada turno.</span></li>
+        <li><span class="dot"></span><span><b>Lista de reserva</b> — substituição imediata se um bombeiro escalado cair de última hora.</span></li>
+        <li><span class="dot"></span><span><b>Confirmação de escala pelo bombeiro</b> — via WhatsApp ou app, antes do evento.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Sugestão automática de escala</b> <i>(desejável)</i> — por disponibilidade e proximidade.</span></li>
+      </ul>
+      <div class="rule-box"><b>Regra crítica</b>Somente bombeiros com todos os documentos válidos aparecem como elegíveis na montagem da escala (ver módulo Compliance).</div>
+    </div>
+
+    <!-- PRECOS -->
+    <div class="module" id="precos">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Precificação &amp; Remuneração</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 1 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: <b>Operação</b> (configura) · <b>Financeiro</b> (aplica no fechamento)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Régua de valores configurável</b> — por turno e tipo de evento, sem precisar mexer em código a cada mudança de preço.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Adicional noturno / hora extra / DSR</b> <i>(desejável)</i> — cálculo automático sobre a régua base.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Valor de alimentação configurável</b> <i>(desejável)</i> por evento/cliente.</span></li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted)">Fora de escopo: cálculo automático do valor cobrado do cliente (margem) — essa decisão comercial continua manual.</p>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="module" id="financeiro">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Financeiro</div>
+        </div>
+        <span class="status-pill status-pill--plan">Fase 3 — planejado</span>
+      </div>
+      <div class="module-who">Usado por: <b>Financeiro</b> (opera) · <b>Direção</b> (relatórios)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Custo e lucro por evento</b> — calculado automaticamente a partir da escala fechada.</span></li>
+        <li><span class="dot"></span><span><b>Contas a pagar (bombeiros) e a receber (cliente)</b>.</span></li>
+        <li><span class="dot"></span><span><b>Emissão de nota fiscal/recibo</b>.</span></li>
+        <li><span class="dot"></span><span><b>Controle de inadimplência/cobrança</b>.</span></li>
+        <li><span class="dot"></span><span><b>Relatórios de DRE</b> — por evento, cliente ou período.</span></li>
+        <li><span class="dot"></span><span><b>Integração com sistema contábil/ERP</b>.</span></li>
+        <li><span class="dot"></span><span><b>Folha de pagamento por evento</b> — lista de bombeiros, valores e chave PIX, pronta para pagar.</span></li>
+      </ul>
+      <div class="tip-box"><b>Importante</b>O sistema monta a folha "pronta para pagar" e o arquivo de remessa quando aplicável — mas quem dispara o pagamento continua sendo o time financeiro, no banco. O sistema não movimenta dinheiro sozinho.</div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="module" id="usuarios">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Usuários &amp; Permissões</div>
+        </div>
+        <span class="status-pill status-pill--build">Fase 0 — em construção</span>
+      </div>
+      <div class="module-who">Usado por: todos os perfis</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Múltiplos usuários com login individual</b>.</span></li>
+        <li><span class="dot"></span><span><b>Log de auditoria</b> — quem alterou o quê, e quando, em qualquer cadastro, documento, escala ou valor.</span></li>
+        <li><span class="dot"></span><span style="color:var(--muted)"><b>Permissões por papel</b> <i>(desejável)</i> — granularidade além dos 4 perfis-base (operação/financeiro/direção).</span></li>
+      </ul>
+    </div>
+
+    <!-- COMUNICACAO -->
+    <div class="module" id="comunicacao">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Comunicação &amp; Notificações</div>
+        </div>
+        <span class="status-pill status-pill--plan">Fase 4 — planejado</span>
+      </div>
+      <div class="module-who">Usado por: todos os perfis (recebem) · sistema (dispara automaticamente)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Alertas automáticos</b> — documento vencendo, escala incompleta, pagamento atrasado.</span></li>
+        <li><span class="dot"></span><span><b>Notificação por e-mail</b>.</span></li>
+        <li><span class="dot"></span><span><b>Notificação por WhatsApp</b> — via WhatsApp Business API.</span></li>
+        <li><span class="dot"></span><span><b>Notificações dentro do sistema</b> — central de avisos in-app.</span></li>
+      </ul>
+    </div>
+
+    <!-- RELATORIOS -->
+    <div class="module" id="relatorios">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Relatórios &amp; Indicadores</div>
+        </div>
+        <span class="status-pill status-pill--plan">Fase 6 — planejado</span>
+      </div>
+      <div class="module-who">Usado por: <b>Direção</b> (principal) · <b>Financeiro</b> e <b>Operação</b> (relatórios do próprio domínio)</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Dashboard com indicadores em tempo real</b>.</span></li>
+        <li><span class="dot"></span><span><b>Exportação de relatórios</b> — Excel e PDF.</span></li>
+        <li><span class="dot"></span><span><b>Comparativos por período</b> — mês, trimestre, ano.</span></li>
+      </ul>
+    </div>
+
+    <!-- INTEGRACOES -->
+    <div class="module" id="integracoes">
+      <div class="module-head">
+        <div>
+          <div class="module-eyebrow">Módulo</div>
+          <div class="module-title">Integrações &amp; Migração de Dados</div>
+        </div>
+        <span class="status-pill status-pill--plan">Fase 5 — planejado</span>
+      </div>
+      <div class="module-who">Usado por: <b>Financeiro</b> e <b>Operação</b> (configuram) · roda em segundo plano</div>
+      <ul class="feature-list">
+        <li><span class="dot"></span><span><b>Migração das planilhas atuais</b> para o sistema novo — carga única na virada para produção.</span></li>
+        <li><span class="dot"></span><span><b>Integração com WhatsApp Business</b>.</span></li>
+        <li><span class="dot"></span><span><b>Integração com sistema de folha de pagamento</b>.</span></li>
+        <li><span class="dot"></span><span><b>Integração com ERP/contábil já usado</b> pela empresa.</span></li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted)">O provedor concreto de cada integração ainda depende de definição do cliente — ver seção 11 do <a href="arquitetura-sistema.html">documento de arquitetura</a>.</p>
+    </div>
+
+    <!-- FAQ -->
+    <div class="module" id="faq">
+      <div class="module-eyebrow">Referência</div>
+      <div class="module-title">Perguntas frequentes</div>
+
+      <div class="faq-item">
+        <div class="faq-q">O sistema paga os bombeiros automaticamente?</div>
+        <div class="faq-a">Não. Ele calcula e organiza a folha (quem recebe, quanto, qual chave PIX), pronta para o financeiro aprovar e pagar no banco.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Um bombeiro com ASO vencido pode ser escalado por engano?</div>
+        <div class="faq-a">Não. O sistema remove automaticamente bombeiros com documento vencido da lista de elegíveis para escala — não depende de alguém lembrar de checar.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">O cliente contratante tem acesso ao sistema?</div>
+        <div class="faq-a">Não nesta fase — o cliente informou que não precisa de portal próprio. O contato com o contratante continua por proposta/orçamento e comunicação direta.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Dá para usar pelo celular?</div>
+        <div class="faq-a">O Portal do Bombeiro é pensado como app instalável no celular (PWA) desde a Fase 2. O painel administrativo (coordenação/financeiro/direção) é otimizado para desktop, mas funciona em navegador de celular também.</div>
+      </div>
+
+    </div>
+
+    <!-- GLOSSARIO -->
+    <div class="module" id="glossario">
+      <div class="module-eyebrow">Referência</div>
+      <div class="module-title">Glossário</div>
+      <div class="glossary-grid">
+        <div class="glossary-item"><b>ASO</b> — Atestado de Saúde Ocupacional, documento obrigatório com validade.</div>
+        <div class="glossary-item"><b>Credenciamento</b> — habilitação do bombeiro civil junto ao Corpo de Bombeiros, com validade.</div>
+        <div class="glossary-item"><b>Escala</b> — alocação de um bombeiro a um turno específico de um evento.</div>
+        <div class="glossary-item"><b>Lista de reserva</b> — bombeiros disponíveis para substituição de última hora.</div>
+        <div class="glossary-item"><b>Régua de preços</b> — tabela configurável de valores por turno/tipo de evento.</div>
+        <div class="glossary-item"><b>DRE</b> — Demonstrativo de Resultado do Exercício; aqui, por evento/cliente/período.</div>
+        <div class="glossary-item"><b>RLS</b> — Row Level Security; regra no banco de dados que garante que cada usuário só vê o que seu papel permite.</div>
+        <div class="glossary-item"><b>Portal do Bombeiro</b> — área de acesso individual do bombeiro (web/app), separada do painel administrativo.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="site-footer">
+  <span>MUG Solutions © 2026 — Manual do Sistema</span>
+  <span>Brigada Camarão · v1.0 — 26/08/2026</span>
+</div>
+
+</body>
+</html>

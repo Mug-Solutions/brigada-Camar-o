@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arquitetura do Sistema — Brigada Camarão · MUG Solutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #4444BB;
+    --purple-dark: #2e2e8a;
+    --purple-light: #6868cc;
+    --purple-bg: #f0f0fa;
+    --purple-border: #d0d0ef;
+    --dark: #1a1a2e;
+    --text: #2d2d3a;
+    --muted: #7070a0;
+    --light: #f8f8fd;
+    --white: #ffffff;
+    --border: #e2e2f0;
+    --ok: #1a7a4a; --ok-bg: #f0faf4; --ok-border: #b8e8cc;
+    --warn: #a2740a; --warn-bg: #fbf3df; --warn-border: #ecd9a4;
+    --off: #b23324; --off-bg: #fbeae8; --off-border: #f0c4bd;
+    --info: #2464a8; --info-bg: #eaf3fb; --info-border: #bcdbf3;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #eeeef8;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  :focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
+  a { color: var(--purple); }
+  code, .mono { font-family: 'JetBrains Mono', 'Consolas', monospace; }
+
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-name { font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700; color: var(--dark); letter-spacing: -0.01em; line-height: 1; }
+  .logo-name.white { color: white; }
+  .logo-tag { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .logo-tag.white { color: rgba(255,255,255,0.6); }
+
+  .banner { background: var(--purple-dark); position: relative; overflow: hidden; }
+  .banner-deco-1 { position: absolute; top: -160px; right: -160px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(100,100,220,0.35) 0%, transparent 70%); pointer-events: none; }
+  .banner-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px; position: relative; z-index: 2; }
+  .banner-badge { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 20px; }
+  .banner-body { padding: 8px 48px 36px; position: relative; z-index: 2; max-width: 780px; }
+  .banner-for { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 14px; margin-bottom: 18px; }
+  .banner-for-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  .banner-for-value { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .banner-for-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); }
+  .banner-title { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.15; color: white; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .banner-desc { font-size: 14px; color: rgba(255,255,255,0.6); max-width: 600px; line-height: 1.7; font-weight: 300; }
+
+  .page { max-width: 980px; margin: 0 auto; background: var(--white); }
+  .page-body { padding: 44px 56px 8px; }
+
+  .toc { background: var(--light); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 44px; }
+  .toc b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: block; margin-bottom: 10px; }
+  .toc ol { columns: 2; column-gap: 28px; padding-left: 18px; font-size: 13px; }
+  .toc li { margin-bottom: 6px; break-inside: avoid; }
+  .toc a { text-decoration: none; color: var(--text); }
+  .toc a:hover { color: var(--purple); }
+
+  .section { margin-bottom: 50px; }
+  .section-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .section-num { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--white); background: var(--purple); padding: 2px 8px; border-radius: 3px; }
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--purple); }
+  .section-title { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 600; color: var(--dark); line-height: 1.2; margin: 6px 0 8px; letter-spacing: -0.01em; }
+  .section-intro { font-size: 13.5px; color: var(--muted); max-width: 74ch; margin-bottom: 20px; }
+
+  h3.sub { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; color: var(--dark); margin: 26px 0 10px; }
+  p { font-size: 13.5px; margin-bottom: 10px; }
+  ul.plain { padding-left: 20px; font-size: 13.5px; margin-bottom: 10px; }
+  ul.plain li { margin-bottom: 4px; }
+
+  /* callouts */
+  .callout { border-radius: 8px; padding: 14px 18px; margin: 14px 0; font-size: 13px; border: 1px solid; }
+  .callout b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .callout--info { background: var(--info-bg); border-color: var(--info-border); color: #1c4a72; }
+  .callout--warn { background: var(--warn-bg); border-color: var(--warn-border); color: #6d4f06; }
+  .callout--ok { background: var(--ok-bg); border-color: var(--ok-border); color: #124d30; }
+
+  /* role grid */
+  .role-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+  .role-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: var(--light); }
+  .role-card .icon { font-size: 20px; margin-bottom: 8px; }
+  .role-card h4 { font-family: 'Outfit', sans-serif; font-size: 13.5px; color: var(--dark); margin-bottom: 6px; }
+  .role-card p { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* topology diagram */
+  .topo { border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; background: linear-gradient(180deg,#fafaff,#f4f4fc); margin: 18px 0; }
+  .layer { border: 1.5px dashed var(--purple-border); border-radius: 10px; padding: 16px 18px 18px; margin-bottom: 8px; background: rgba(255,255,255,0.6); }
+  .layer-title { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--purple); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .layer-title .tag { background: var(--purple); color: white; font-size: 9px; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.05em; }
+  .node-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .node { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 12px; flex: 1 1 190px; box-shadow: 0 1px 2px rgba(30,30,70,0.04); }
+  .node b { display: block; color: var(--dark); font-size: 12.5px; margin-bottom: 2px; }
+  .node span { color: var(--muted); font-size: 11.3px; }
+  .node.accent { border-color: var(--purple-border); background: var(--purple-bg); }
+  .arrow-down { text-align: center; color: var(--purple-light); font-size: 18px; line-height: 1; margin: 2px 0 6px; }
+
+  /* module mapping table */
+  .mtable { width: 100%; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; border-collapse: collapse; font-size: 12.5px; }
+  .mtable th { background: var(--dark); color: white; text-align: left; padding: 10px 14px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .mtable td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .mtable tr:last-child td { border-bottom: none; }
+  .mtable tr:nth-child(even) td { background: var(--light); }
+  .pill { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; border: 1px solid; white-space: nowrap; }
+  .pill--ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+  .pill--warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+  .pill--off { background: var(--off-bg); border-color: var(--off-border); color: var(--off); }
+  .pill--info { background: var(--info-bg); border-color: var(--info-border); color: var(--info); }
+
+  /* entity cards (data model) */
+  .domain { margin-bottom: 22px; }
+  .domain-title { font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--purple-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .domain-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .entity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .entity { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .entity-head { background: var(--light); padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--dark); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .entity-head .badge { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; text-transform: uppercase; }
+  .entity-fields { padding: 8px 12px; font-size: 11.5px; color: var(--muted); line-height: 1.65; }
+  .entity-fields b { color: var(--text); font-weight: 500; }
+
+  /* roadmap */
+  .phase { display: grid; grid-template-columns: 90px 1fr; gap: 18px; margin-bottom: 4px; }
+  .phase-marker { display: flex; flex-direction: column; align-items: center; }
+  .phase-dot { width: 30px; height: 30px; border-radius: 50%; background: var(--purple); color: white; font-family: 'Outfit',sans-serif; font-weight: 700; font-size: 12.5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .phase-line { width: 2px; flex: 1; background: var(--purple-border); margin-top: 4px; }
+  .phase:last-child .phase-line { display: none; }
+  .phase-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-bottom: 22px; background: var(--white); }
+  .phase-card h4 { font-family: 'Outfit', sans-serif; font-size: 14.5px; color: var(--dark); margin-bottom: 4px; }
+  .phase-meta { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .phase-meta .dur { color: var(--purple); font-weight: 600; }
+  .phase-list { padding-left: 18px; font-size: 12.5px; }
+  .phase-list li { margin-bottom: 3px; }
+
+  .risk-table { width: 100%; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+  .risk-table th { background: var(--dark); color: white; text-align: left; padding: 9px 14px; font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .risk-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .risk-table tr:nth-child(even) td { background: var(--light); }
+
+  .site-footer { background: var(--dark); color: rgba(255,255,255,0.4); display: flex; justify-content: space-between; align-items: center; padding: 20px 56px; font-size: 11.5px; max-width: 980px; margin: 0 auto; flex-wrap: wrap; gap: 6px; }
+  .site-footer a { color: rgba(180,180,255,0.7); text-decoration: none; }
+
+  .print-btn { position: fixed; top: 20px; right: 20px; z-index: 10; background: var(--purple); color: white; border: none; border-radius: 7px; padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 10px 24px -10px rgba(46,46,138,0.5); }
+
+  @media (max-width: 760px) {
+    .page-body, .banner-nav, .banner-body, .site-footer { padding-left: 20px; padding-right: 20px; }
+    .toc ol { columns: 1; }
+    .role-grid, .entity-grid { grid-template-columns: 1fr; }
+    .mtable { display: block; overflow-x: auto; }
+    .print-btn { display: none; }
+  }
+  @media print {
+    body { background: white; }
+    .print-btn { display: none; }
+    .page { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ Exportar PDF</button>
+
+<div class="banner">
+  <div class="banner-deco-1"></div>
+  <div class="banner-nav">
+    <div class="logo-wrap">
+      <div>
+        <div class="logo-name white">MUG SOLUTIONS</div>
+        <div class="logo-tag white">Ferramentas Digitais B2B</div>
+      </div>
+    </div>
+    <div class="banner-badge">DOCUMENTO TÉCNICO</div>
+  </div>
+  <div class="banner-body">
+    <div class="banner-for">
+      <span class="banner-for-label">Cliente</span>
+      <span class="banner-for-dot"></span>
+      <span class="banner-for-value">Brigada Camarão</span>
+    </div>
+    <div class="banner-title">Arquitetura do Sistema &amp; Plano de Construção</div>
+    <div class="banner-desc">Desenho técnico completo do sistema de gestão da Brigada Camarão — topologia, modelo de dados, estratégia de escalabilidade e roteiro de entrega, com base nos 40 requisitos essenciais e 10 desejáveis validados no PRD de escopo (26/08/2026).</div>
+  </div>
+</div>
+
+<div class="page">
+<div class="page-body">
+
+  <div class="toc">
+    <b>Sumário</b>
+    <ol>
+      <li><a href="#visao">Visão geral e princípios de design</a></li>
+      <li><a href="#papeis">Perfis de usuário</a></li>
+      <li><a href="#topologia">Topologia do sistema</a></li>
+      <li><a href="#stack">Stack tecnológico</a></li>
+      <li><a href="#dados">Modelo de dados</a></li>
+      <li><a href="#modulos">Módulos × requisitos do PRD</a></li>
+      <li><a href="#escala">Escalabilidade e confiabilidade</a></li>
+      <li><a href="#seguranca">Segurança e conformidade</a></li>
+      <li><a href="#integracoes">Integrações externas</a></li>
+      <li><a href="#roadmap">Plano de construção por fases</a></li>
+      <li><a href="#riscos">Riscos e decisões em aberto</a></li>
+      <li><a href="#estado">Estado atual do protótipo</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. VISÃO GERAL -->
+  <div class="section" id="visao">
+    <div class="section-eyebrow"><span class="section-num">01</span><span class="section-label">Fundamentos</span></div>
+    <div class="section-title">Visão geral e princípios de design</div>
+    <p class="section-intro">O sistema substitui o controle por planilhas/WhatsApp da Brigada Camarão por uma plataforma única que cobre todo o ciclo: cadastro e compliance dos bombeiros civis, contratação por empresas, montagem de escala, execução do evento e fechamento financeiro (custo, cobrança, folha e nota fiscal).</p>
+
+    <div class="callout callout--info">
+      <b>Escala do negócio hoje</b>
+      300 bombeiros ativos · ~50 eventos/mês · meta de 100 bombeiros a mais em 12 meses · prazo desejado dezembro/2026. Isso é carga pequena/média para um banco relacional — o desenho abaixo prioriza corretude, auditabilidade e automação de rotina sobre otimização prematura de performance.
+    </div>
+
+    <h3 class="sub">Princípios que guiam as decisões técnicas</h3>
+    <ul class="plain">
+      <li><b>Single-tenant, multi-papel</b> — um sistema dedicado à Brigada Camarão (não um SaaS multi-cliente). O RBAC separa Direção, Financeiro, Operação e Bombeiro dentro dessa única organização. Multi-tenant fica documentado como evolução futura caso a MUG queira revender este produto a outras empresas de brigada.</li>
+      <li><b>Mobile-first para o bombeiro, desktop-first para a coordenação</b> — o Portal do Bombeiro é a superfície de maior volume de acesso (300+ pessoas no campo); o painel administrativo prioriza densidade de informação para quem opera escala e financeiro.</li>
+      <li><b>Documento vencido é bloqueio, não aviso</b> — a regra "bloqueio automático de escalação com documento vencido" é tratada como invariante de dados (constraint/validação no backend), nunca apenas como alerta visual no frontend.</li>
+      <li><b>Nada de novo dinheiro se move fora de sistemas regulados</b> — o sistema calcula e prepara (folha pronta para pagar, arquivo PIX em lote, DRE), mas o disparo de pagamento em si continua no banco/ERP do cliente. Isso evita escopo de instituição de pagamento.</li>
+      <li><b>Integrações via adaptador</b> — WhatsApp, ERP/contábil e folha de pagamento são plugados atrás de uma interface interna estável, porque o provedor concreto de cada um ainda não foi definido com o cliente (ver <a href="#riscos">seção 11</a>).</li>
+    </ul>
+  </div>
+
+  <!-- 2. PAPÉIS -->
+  <div class="section" id="papeis">
+    <div class="section-eyebrow"><span class="section-num">02</span><span class="section-label">Usuários</span></div>
+    <div class="section-title">Perfis de usuário</div>
+    <p class="section-intro">Requisito do PRD: múltiplos usuários com login individual, permissões por papel e log de auditoria. Quatro papéis cobrem todos os fluxos mapeados:</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="icon">🧭</div>
+        <h4>Direção</h4>
+        <p>Visão completa: dashboards, DRE, todos os módulos. Aprova propostas/orçamentos de maior valor.</p>
+      </div>
+      <div class="role-card">
+        <div class="icon">📋</div>
+        <h4>Operação / Coordenação</h4>
+        <p>Cadastro de bombeiros e clientes, aprovação de candidaturas, montagem de escala, aprovação de documentos do autocadastro.</p>
+      </div>
+      <div class="role-card">
+        <div class="icon">💰</div>
+        <h4>Financeiro</h4>
+        <p>Contas a pagar/receber, emissão de NF, folha por evento, inadimplência, integrações com ERP e folha de pagamento.</p>
+      </div>
+      <div class="role-card">
+        <div class="icon">🧯</div>
+        <h4>Bombeiro</h4>
+        <p>Acesso só ao Portal do Bombeiro: autocadastro, documentos, candidatura a eventos, escala confirmada, histórico.</p>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted)">Implementação: Supabase Auth (e-mail/senha ou magic link) + tabela <code class="mono">usuarios.papel</code> + Row Level Security por papel em cada tabela. Toda alteração relevante grava em <code class="mono">auditoria_logs</code> (quem, o quê, quando, valor anterior/novo).</p>
+  </div>
+
+  <!-- 3. TOPOLOGIA -->
+  <div class="section" id="topologia">
+    <div class="section-eyebrow"><span class="section-num">03</span><span class="section-label">Arquitetura</span></div>
+    <div class="section-title">Topologia do sistema</div>
+    <p class="section-intro">Quatro camadas: cliente, aplicação, dados/automação e integrações externas. A camada de aplicação nunca expõe credenciais de integração ao navegador — tudo passa por Server Actions/Route Handlers no servidor.</p>
+
+    <div class="topo">
+      <div class="layer">
+        <div class="layer-title"><span class="tag">L1</span> Camada de Cliente</div>
+        <div class="node-row">
+          <div class="node accent"><b>Painel Web</b><span>Direção · Operação · Financeiro — Next.js SSR, desktop-first</span></div>
+          <div class="node accent"><b>App do Bombeiro</b><span>PWA instalável (fase 1) → wrapper nativo se necessário (fase 2)</span></div>
+        </div>
+      </div>
+      <div class="arrow-down">↓ HTTPS</div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="tag">L2</span> Camada de Aplicação — Next.js na Vercel</div>
+        <div class="node-row">
+          <div class="node"><b>Server Actions / Route Handlers</b><span>regra de negócio, validação (Zod), orquestração</span></div>
+          <div class="node"><b>Auth &amp; RBAC</b><span>Supabase Auth + middleware por papel</span></div>
+          <div class="node"><b>Webhooks de entrada</b><span>respostas do WhatsApp, callbacks de ERP</span></div>
+        </div>
+      </div>
+      <div class="arrow-down">↓ service role (nunca no navegador)</div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="tag">L3</span> Camada de Dados &amp; Automação — Supabase</div>
+        <div class="node-row">
+          <div class="node"><b>Postgres</b><span>dados operacionais, RLS por papel, índices por evento/bombeiro</span></div>
+          <div class="node"><b>Storage</b><span>documentos (ASO, credenciamento, contratos) em buckets privados + signed URL</span></div>
+          <div class="node"><b>Realtime</b><span>notificações in-app e dashboard ao vivo</span></div>
+          <div class="node"><b>Edge Functions + pg_cron</b><span>job diário de vencimento de documentos, disparo de alertas, geração de folha</span></div>
+        </div>
+      </div>
+      <div class="arrow-down">↓ adaptadores</div>
+
+      <div class="layer">
+        <div class="layer-title"><span class="tag">L4</span> Integrações Externas</div>
+        <div class="node-row">
+          <div class="node"><b>WhatsApp Business API</b><span>alertas, confirmação de escala (provedor a definir)</span></div>
+          <div class="node"><b>E-mail transacional</b><span>Resend/SendGrid — alertas e cobrança</span></div>
+          <div class="node"><b>ERP / Contábil</b><span>DRE, contas a pagar/receber (sistema do cliente a definir)</span></div>
+          <div class="node"><b>Folha de Pagamento</b><span>exportação da folha por evento (sistema do cliente a definir)</span></div>
+          <div class="node"><b>PIX em lote</b><span>geração de arquivo de remessa — o disparo é feito no banco, não no sistema</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout--warn">
+      <b>Decisão deliberada</b>
+      O sistema nunca inicia uma transferência bancária diretamente. Ele produz a "folha pronta para pagar" (lista + valores + chave PIX) e, se aplicável, o arquivo de remessa — o pagamento em si é aprovado e disparado pelo time financeiro no banco/ERP. Isso mantém o sistema fora do escopo regulatório de instituição de pagamento.
+    </div>
+  </div>
+
+  <!-- 4. STACK -->
+  <div class="section" id="stack">
+    <div class="section-eyebrow"><span class="section-num">04</span><span class="section-label">Tecnologia</span></div>
+    <div class="section-title">Stack tecnológico</div>
+    <table class="mtable">
+      <tr><th>Camada</th><th>Tecnologia</th><th>Por quê</th></tr>
+      <tr><td>Frontend web</td><td class="mono">Next.js 15 (App Router) + TypeScript + Tailwind</td><td>Já é a base do protótipo; SSR bom para dashboards densos; Server Actions eliminam API própria para o CRUD interno.</td></tr>
+      <tr><td>App do bombeiro</td><td class="mono">PWA (Next.js) → React Native/Expo se a loja de app for exigida</td><td>PWA cobre "acesso próprio + notificação" mais rápido e barato; reavaliar nativo após validar adoção.</td></tr>
+      <tr><td>Backend / dados</td><td class="mono">Supabase (Postgres + Auth + Storage + Realtime)</td><td>Já adotado no protótipo; RLS nativo cobre o RBAC exigido sem servidor de auth separado.</td></tr>
+      <tr><td>Automação / jobs</td><td class="mono">Supabase Edge Functions + pg_cron</td><td>Job diário de vencimento de documento, disparo de notificações, fechamento de folha — sem infra extra.</td></tr>
+      <tr><td>Notificação WhatsApp</td><td class="mono">Meta WhatsApp Cloud API (ou Z-API/Twilio como alternativa)</td><td>Requisito essencial do PRD; Cloud API é a via oficial da Meta, menor risco de bloqueio de número.</td></tr>
+      <tr><td>E-mail</td><td class="mono">Resend</td><td>Integração simples com Next.js, bom custo para volume baixo/médio.</td></tr>
+      <tr><td>Hospedagem</td><td class="mono">Vercel (app) + Supabase Cloud (dados)</td><td>Deploy contínuo, edge network, sem servidor para operar.</td></tr>
+      <tr><td>Observabilidade</td><td class="mono">Vercel Logs + Sentry</td><td>Erros em produção rastreáveis sem infra própria.</td></tr>
+      <tr><td>Validação</td><td class="mono">Zod</td><td>Mesmo schema valida formulário e Server Action — cadastro de bombeiro/documento é fronteira crítica de dado.</td></tr>
+    </table>
+  </div>
+
+  <!-- 5. MODELO DE DADOS -->
+  <div class="section" id="dados">
+    <div class="section-eyebrow"><span class="section-num">05</span><span class="section-label">Dados</span></div>
+    <div class="section-title">Modelo de dados</div>
+    <p class="section-intro">Modelo lógico organizado em 6 domínios. As quatro primeiras tabelas de <b>Pessoas &amp; Compliance</b> e <b>Operação</b> já existem no protótipo (<code class="mono">schema.sql</code>); as demais são a extensão necessária para cobrir os 40 requisitos essenciais.</p>
+
+    <div class="domain">
+      <div class="domain-title">Pessoas &amp; Compliance</div>
+      <div class="entity-grid">
+        <div class="entity">
+          <div class="entity-head">bombeiros <span class="badge" style="background:var(--ok-bg);color:var(--ok)">existe</span></div>
+          <div class="entity-fields"><b>+ novos:</b> endereco, foto_url, chave_pix, disponibilidade (jsonb: dias/horários/regiões)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">bombeiro_documentos <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">tipo (ASO/credenciamento/curso), arquivo_url, data_emissao, <b>data_vencimento</b>, status (calculado)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">bombeiro_funcoes <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">bombeiro_id, funcao — permite múltiplas hierarquias por bombeiro (líder + socorrista, etc.)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">usuarios <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">auth_id (fk Supabase Auth), nome, papel, bombeiro_id (nullable), ativo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-title">Comercial</div>
+      <div class="entity-grid">
+        <div class="entity">
+          <div class="entity-head">clientes <span class="badge" style="background:var(--ok-bg);color:var(--ok)">existe</span></div>
+          <div class="entity-fields"><b>+ novos:</b> endereco completo</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">propostas <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo · desejável</span></div>
+          <div class="entity-fields">cliente_id, itens, valor, status (rascunho/enviada/aprovada), evento_id gerado na aprovação</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-title">Operação</div>
+      <div class="entity-grid">
+        <div class="entity">
+          <div class="entity-head">eventos <span class="badge" style="background:var(--ok-bg);color:var(--ok)">existe</span></div>
+          <div class="entity-fields"><b>+ novo:</b> status_aprovacao_orcamento (fluxo antes de fechar contrato)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">evento_materiais <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo · desejável</span></div>
+          <div class="entity-fields">evento_id, material, quantidade, validade (controle de estoque)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">evento_candidaturas <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo · desejável</span></div>
+          <div class="entity-fields">evento_id, bombeiro_id, status (candidatado/aprovado/recusado)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">escalas <span class="badge" style="background:var(--ok-bg);color:var(--ok)">existe</span></div>
+          <div class="entity-fields"><b>+ novos:</b> status_confirmacao (bombeiro confirma via app/WhatsApp), ponto_inicio, ponto_fim</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">lista_reserva <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">evento_id, bombeiro_id, prioridade — substituição de última hora</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">regua_precos <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">turno, tipo_evento, valor_base, adicional_noturno, valor_alimentacao</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-title">Financeiro</div>
+      <div class="entity-grid">
+        <div class="entity">
+          <div class="entity-head">eventos_financeiro <span class="badge" style="background:var(--ok-bg);color:var(--ok)">existe</span></div>
+          <div class="entity-fields"><b>+ novos:</b> nf_numero, nf_status, custo_total, lucro_total (calculados)</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">pagamentos_bombeiros <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">evento_id, bombeiro_id, valor, chave_pix, status, lote_id — a "folha pronta para pagar"</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">lancamentos_financeiros <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">tipo (a_pagar/a_receber), origem, valor, vencimento, status — base para DRE e inadimplência</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="domain">
+      <div class="domain-title">Comunicação &amp; Sistema</div>
+      <div class="entity-grid">
+        <div class="entity">
+          <div class="entity-head">notificacoes <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">destinatario_id, tipo, canal (whatsapp/email/in-app), payload, status_envio, tentativas</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">integracoes_config <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">provedor (whatsapp/erp/folha), credenciais (criptografadas), mapeamento de campos</div>
+        </div>
+        <div class="entity">
+          <div class="entity-head">auditoria_logs <span class="badge" style="background:var(--warn-bg);color:var(--warn)">novo</span></div>
+          <div class="entity-fields">usuario_id, tabela, registro_id, acao, valor_antes, valor_depois, criado_em</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. MÓDULOS x PRD -->
+  <div class="section" id="modulos">
+    <div class="section-eyebrow"><span class="section-num">06</span><span class="section-label">Rastreabilidade</span></div>
+    <div class="section-title">Módulos do sistema × requisitos do PRD</div>
+    <p class="section-intro">Cada seção do PRD de escopo vira um módulo do sistema, com a fase de entrega em que será construído.</p>
+    <table class="mtable">
+      <tr><th>Seção do PRD</th><th>Módulo no sistema</th><th>Itens essenciais</th><th>Fase</th></tr>
+      <tr><td>Bombeiros — Cadastro &amp; Compliance</td><td>Compliance</td><td>6</td><td><span class="pill pill--info">Fase 1</span></td></tr>
+      <tr><td>Clientes / Contratantes</td><td>Comercial</td><td>1</td><td><span class="pill pill--info">Fase 1</span></td></tr>
+      <tr><td>Eventos &amp; Contratos</td><td>Operação</td><td>2</td><td><span class="pill pill--info">Fase 1</span></td></tr>
+      <tr><td>Escala &amp; Alocação</td><td>Operação</td><td>4</td><td><span class="pill pill--info">Fase 1</span></td></tr>
+      <tr><td>Precificação &amp; Remuneração</td><td>Operação</td><td>1</td><td><span class="pill pill--info">Fase 1</span></td></tr>
+      <tr><td>Portal do Bombeiro</td><td>Portal do Bombeiro</td><td>6</td><td><span class="pill pill--ok">Fase 2</span></td></tr>
+      <tr><td>Financeiro</td><td>Financeiro</td><td>7</td><td><span class="pill pill--ok">Fase 3</span></td></tr>
+      <tr><td>Usuários &amp; Permissões</td><td>Sistema / Auth</td><td>2</td><td><span class="pill pill--off">Fase 0</span></td></tr>
+      <tr><td>Comunicação &amp; Notificações</td><td>Comunicação</td><td>4</td><td><span class="pill pill--warn">Fase 4</span></td></tr>
+      <tr><td>Relatórios &amp; Indicadores</td><td>Relatórios</td><td>3</td><td><span class="pill pill--warn">Fase 6</span></td></tr>
+      <tr><td>Integrações &amp; Migração</td><td>Integrações</td><td>4</td><td><span class="pill pill--warn">Fase 5</span></td></tr>
+    </table>
+    <p style="font-size:11.5px;color:var(--muted);margin-top:10px">Os 10 itens desejáveis (disponibilidade, sugestão automática de escala, candidatura a eventos, histórico por cliente, proposta pelo sistema, materiais/estoque, adicional noturno/hora extra/DSR, alimentação configurável, permissões granulares por papel) entram na <a href="#roadmap">Fase 7</a>, após o essencial estar em produção.</p>
+  </div>
+
+  <!-- 7. ESCALABILIDADE -->
+  <div class="section" id="escala">
+    <div class="section-eyebrow"><span class="section-num">07</span><span class="section-label">Não-funcional</span></div>
+    <div class="section-title">Escalabilidade e confiabilidade</div>
+    <p class="section-intro">O volume atual (300 bombeiros, ~50 eventos/mês, meta de 400 bombeiros em 12 meses) está bem dentro da capacidade de uma instância Postgres gerenciada. O desenho abaixo garante headroom para picos de uso concorrente sem exigir re-arquitetura.</p>
+    <ul class="plain">
+      <li><b>Picos de concorrência previsíveis</b> — dia de evento gera rajada de confirmações de escala e registros de ponto simultâneos; índices em <code class="mono">escalas(evento_id, bombeiro_id)</code> (já no schema) e conexões via pooler do Supabase (PgBouncer) absorvem isso sem contenção.</li>
+      <li><b>Jobs assíncronos, não bloqueantes</b> — verificação de vencimento de documento, disparo de WhatsApp/e-mail e geração de folha rodam em Edge Functions agendadas, nunca no caminho da requisição do usuário.</li>
+      <li><b>Idempotência em notificações</b> — cada disparo grava em <code class="mono">notificacoes</code> antes de chamar o provedor externo; reprocessamento de job não duplica mensagem (chave única por evento+destinatário+tipo+dia).</li>
+      <li><b>Rate limiting em endpoints públicos</b> — webhooks de entrada (resposta de WhatsApp, callback de ERP) e o autocadastro do bombeiro (endpoint sem sessão) ficam atrás de limitação de taxa por IP/telefone.</li>
+      <li><b>Backups e retenção</b> — backup diário automático do Supabase + retenção de 7–30 dias conforme plano; documentos no Storage nunca são deletados fisicamente, apenas marcados como substituídos (histórico de compliance).</li>
+      <li><b>Escala futura</b> — se o volume crescer muito além da meta atual (ex.: MUG replicar o modelo para outros clientes), o ponto de extensão é multi-tenancy via <code class="mono">organizacao_id</code> em todas as tabelas + RLS por organização, não uma reescrita.</li>
+    </ul>
+  </div>
+
+  <!-- 8. SEGURANÇA -->
+  <div class="section" id="seguranca">
+    <div class="section-eyebrow"><span class="section-num">08</span><span class="section-label">Não-funcional</span></div>
+    <div class="section-title">Segurança e conformidade</div>
+    <ul class="plain">
+      <li><b>RLS por papel em toda tabela sensível</b> — um bombeiro só lê/edita seus próprios dados; operação e financeiro têm escopo total dentro do seu domínio.</li>
+      <li><b>Documentos pessoais (ASO, credenciamento) em bucket privado</b> — nunca em URL pública; acesso via signed URL de curta duração.</li>
+      <li><b>Dados pessoais sensíveis (LGPD)</b> — CPF, endereço, chave PIX e documentos de saúde (ASO) exigem base legal de tratamento (execução de contrato de trabalho/prestação de serviço) e política de retenção definida com o cliente.</li>
+      <li><b>Log de auditoria imutável</b> — toda alteração em cadastro, documento, escala e valor financeiro é registrada com usuário e timestamp (requisito essencial do PRD).</li>
+      <li><b>Segredos de integração fora do código</b> — credenciais de WhatsApp/ERP/folha ficam em variáveis de ambiente/tabela criptografada, nunca hardcoded.</li>
+    </ul>
+  </div>
+
+  <!-- 9. INTEGRAÇÕES -->
+  <div class="section" id="integracoes">
+    <div class="section-eyebrow"><span class="section-num">09</span><span class="section-label">Externo</span></div>
+    <div class="section-title">Integrações externas</div>
+    <table class="mtable">
+      <tr><th>Integração</th><th>Direção</th><th>Uso no sistema</th></tr>
+      <tr><td>WhatsApp Business API</td><td>Envio + recebimento</td><td>Alerta de documento vencendo, confirmação de escala pelo bombeiro, notificação de escala incompleta.</td></tr>
+      <tr><td>E-mail transacional</td><td>Envio</td><td>Mesmos alertas do WhatsApp como canal redundante; cobrança de inadimplência ao cliente.</td></tr>
+      <tr><td>ERP / Sistema Contábil</td><td>Envio (push) ou exportação</td><td>DRE por evento/cliente/período, contas a pagar/receber — adaptador a definir conforme o ERP do cliente.</td></tr>
+      <tr><td>Sistema de Folha de Pagamento</td><td>Exportação</td><td>Folha por evento (lista de bombeiros + valores + chave PIX), pronta para importar no sistema de folha do cliente.</td></tr>
+      <tr><td>Migração de planilhas</td><td>Importação única</td><td>Script de carga inicial (bombeiros, histórico de eventos) a partir das planilhas atuais — roda uma vez na virada para produção.</td></tr>
+    </table>
+  </div>
+
+  <!-- 10. ROADMAP -->
+  <div class="section" id="roadmap">
+    <div class="section-eyebrow"><span class="section-num">10</span><span class="section-label">Execução</span></div>
+    <div class="section-title">Plano de construção por fases</div>
+    <p class="section-intro">Sequenciamento pensado para colocar o essencial em produção o quanto antes (meta: dezembro/2026) e tratar os itens desejáveis depois, sem bloquear a operação.</p>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">0</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 0 — Fundamentos</h4>
+        <div class="phase-meta"><span class="dur">~1 semana</span> · pré-requisito de tudo</div>
+        <ul class="phase-list">
+          <li>Autenticação (Supabase Auth) e tabela <code class="mono">usuarios</code> com papéis</li>
+          <li>RLS por papel nas tabelas já existentes</li>
+          <li>Estrutura de auditoria (<code class="mono">auditoria_logs</code>)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">1</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 1 — Núcleo operacional</h4>
+        <div class="phase-meta"><span class="dur">~3 semanas</span> · evolui o que já existe no protótipo</div>
+        <ul class="phase-list">
+          <li>Compliance: documentos por bombeiro, vencimento, bloqueio automático de escalação, múltiplas hierarquias</li>
+          <li>Clientes: cadastro completo (CNPJ, contato, endereço)</li>
+          <li>Eventos: fluxo de aprovação de orçamento, múltiplos turnos/dias</li>
+          <li>Escala: montagem manual, lista de reserva, registro de ponto</li>
+          <li>Régua de preços configurável</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">2</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 2 — Portal do Bombeiro</h4>
+        <div class="phase-meta"><span class="dur">~3 semanas</span></div>
+        <ul class="phase-list">
+          <li>Login próprio, autocadastro (dados, documentos, chave PIX)</li>
+          <li>Fila de aprovação de cadastro pela coordenação</li>
+          <li>Visualização de escala confirmada e histórico</li>
+          <li>Atualização de documentos vencidos pelo próprio bombeiro</li>
+          <li>PWA instalável (app mobile)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">3</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 3 — Financeiro</h4>
+        <div class="phase-meta"><span class="dur">~3 semanas</span></div>
+        <ul class="phase-list">
+          <li>Cálculo automático de custo/lucro por evento</li>
+          <li>Contas a pagar (bombeiros) e a receber (cliente), controle de inadimplência</li>
+          <li>Emissão de nota fiscal/recibo</li>
+          <li>Folha de pagamento por evento — pronta para pagar (PIX)</li>
+          <li>Relatórios de DRE por evento/cliente/período</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">4</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 4 — Comunicação</h4>
+        <div class="phase-meta"><span class="dur">~2 semanas</span> · depende do provedor WhatsApp escolhido</div>
+        <ul class="phase-list">
+          <li>Integração com WhatsApp Business API</li>
+          <li>Notificação por e-mail e in-app</li>
+          <li>Job diário de verificação de vencimento → dispara alertas nos 3 canais</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">5</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 5 — Integrações &amp; migração</h4>
+        <div class="phase-meta"><span class="dur">~2–3 semanas</span> · depende de decisões do cliente (ver riscos)</div>
+        <ul class="phase-list">
+          <li>Adaptador de exportação para ERP/contábil</li>
+          <li>Adaptador de exportação para folha de pagamento</li>
+          <li>Migração das planilhas atuais para o sistema</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">6</div><div class="phase-line"></div></div>
+      <div class="phase-card">
+        <h4>Fase 6 — Relatórios &amp; indicadores</h4>
+        <div class="phase-meta"><span class="dur">~1–2 semanas</span></div>
+        <ul class="phase-list">
+          <li>Dashboard com indicadores em tempo real</li>
+          <li>Exportação de relatórios (Excel/PDF)</li>
+          <li>Comparativos por período (mês/trimestre/ano)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker"><div class="phase-dot">7</div></div>
+      <div class="phase-card">
+        <h4>Fase 7 — Itens desejáveis</h4>
+        <div class="phase-meta"><span class="dur">contínuo, pós-lançamento</span></div>
+        <ul class="phase-list">
+          <li>Registro de disponibilidade do bombeiro (dias/horários/regiões)</li>
+          <li>Bombeiro visualiza e se candidata a eventos em aberto</li>
+          <li>Sugestão automática de escala por disponibilidade/proximidade</li>
+          <li>Adicional noturno / hora extra / DSR automático</li>
+          <li>Valor de alimentação configurável por evento/cliente</li>
+          <li>Registro de materiais/equipamentos e controle de estoque por evento</li>
+          <li>Histórico de eventos por cliente e emissão de proposta/orçamento pelo sistema</li>
+          <li>Permissões granulares por papel (além dos 4 perfis-base)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout--ok">
+      <b>Estimativa total até o essencial completo</b>
+      Fases 0–6 somam ~15–17 semanas de construção (sem contar validação com o cliente entre fases) — compatível com o prazo de dezembro informado no PRD se o início ocorrer em setembro.
+    </div>
+  </div>
+
+  <!-- 11. RISCOS -->
+  <div class="section" id="riscos">
+    <div class="section-eyebrow"><span class="section-num">11</span><span class="section-label">Pendências</span></div>
+    <div class="section-title">Riscos e decisões em aberto</div>
+    <p class="section-intro">Pontos que dependem de resposta do cliente antes ou durante as fases correspondentes — não bloqueiam o início (Fases 0–3), mas bloqueiam a Fase 4 e 5 se não forem resolvidos a tempo.</p>
+    <table class="risk-table">
+      <tr><th>Decisão</th><th>Impacto se não definida</th><th>Fase afetada</th></tr>
+      <tr><td>Qual provedor de WhatsApp Business API (Meta Cloud API direto, Z-API, Twilio)?</td><td>Comunicação via WhatsApp não pode ser implementada</td><td>Fase 4</td></tr>
+      <tr><td>Qual ERP/sistema contábil a Brigada Camarão usa hoje?</td><td>Integração vira exportação manual (CSV) em vez de automática</td><td>Fase 5</td></tr>
+      <tr><td>Qual sistema de folha de pagamento é usado?</td><td>Formato de exportação da folha fica genérico até definição</td><td>Fase 5</td></tr>
+      <tr><td>App mobile precisa estar nas lojas (App Store/Play Store) ou PWA instalável resolve?</td><td>Define se entra React Native na Fase 2 ou fica para depois</td><td>Fase 2</td></tr>
+      <tr><td>Formato/layout das planilhas atuais para migração</td><td>Script de migração não pode ser escrito sem uma amostra real</td><td>Fase 5</td></tr>
+    </table>
+  </div>
+
+  <!-- 12. ESTADO ATUAL -->
+  <div class="section" id="estado">
+    <div class="section-eyebrow"><span class="section-num">12</span><span class="section-label">Ponto de partida</span></div>
+    <div class="section-title">Estado atual do protótipo</div>
+    <p class="section-intro">O que já existe em <code class="mono">prototipo/sistema/</code> (Next.js + Supabase) antes desta fase de construção completa:</p>
+    <ul class="plain">
+      <li>✅ Schema inicial com 4 tabelas: <code class="mono">bombeiros</code>, <code class="mono">clientes</code>, <code class="mono">eventos</code>, <code class="mono">escalas</code>, <code class="mono">eventos_financeiro</code></li>
+      <li>✅ Telas de listagem/cadastro: bombeiros (com formulário de novo bombeiro), eventos, financeiro, painel</li>
+      <li>⚠️ RLS propositalmente desligado — schema.sql documenta isso como pendência da "próxima fase" (agora, Fase 0)</li>
+      <li>⚠️ Sem autenticação, sem Portal do Bombeiro, sem notificações, sem integrações externas</li>
+      <li>📋 Dados de demonstração fictícios (modo apresentação) — serão substituídos por dados reais na migração da Fase 5</li>
+    </ul>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">Ou seja: a Fase 1 deste plano não começa do zero — é a extensão direta do que já está validado no protótipo.</p>
+  </div>
+
+</div>
+</div>
+
+<div class="site-footer">
+  <span>MUG Solutions © 2026 — Documento técnico interno</span>
+  <span>Brigada Camarão · Arquitetura do Sistema · v1.0 — 26/08/2026</span>
+</div>
+
+</body>
+</html>

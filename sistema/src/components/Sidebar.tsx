@@ -2,19 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/lib/auth/logout";
 
 const NAV_ITEMS = [
   { href: "/painel", label: "Painel", icon: "◆" },
   { href: "/bombeiros", label: "Bombeiros", icon: "☰" },
+  { href: "/clientes", label: "Clientes", icon: "◈" },
   { href: "/eventos", label: "Eventos & Escalas", icon: "▦" },
+  { href: "/precos", label: "Preços", icon: "%" },
   { href: "/financeiro", label: "Financeiro", icon: "$" },
+  { href: "/auditoria", label: "Auditoria", icon: "⌕" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar flex w-[236px] shrink-0 flex-col p-4">
+    <aside className="sidebar flex min-h-screen w-[236px] shrink-0 flex-col p-4">
       <div className="px-1.5 pb-2 pt-0.5">
         <div className="flex flex-col" style={{ fontFamily: "var(--font-display)" }}>
           <span className="text-[15px] tracking-wide" style={{ color: "var(--shell-text-soft)" }}>
@@ -46,6 +50,12 @@ export function Sidebar() {
           );
         })}
       </nav>
+      <form action={signOut} className="mt-auto pt-4">
+        <button type="submit" className="nav-item w-full text-left">
+          <span className="w-4 text-center text-sm">↩</span>
+          Sair
+        </button>
+      </form>
     </aside>
   );
 }

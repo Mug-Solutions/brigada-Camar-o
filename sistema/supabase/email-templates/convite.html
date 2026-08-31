@@ -1,0 +1,29 @@
+<!-- Template de e-mail "Invite user" — colar no Supabase em
+     Authentication → Email Templates → Invite user.
+
+     Importante: o link usa {{ .TokenHash }} apontando pra nossa
+     própria página (/convite), NÃO {{ .ConfirmationURL }} (que aponta
+     direto pro endpoint de verificação do Supabase e é consumido por
+     qualquer requisição GET, inclusive escaneamento automático de
+     e-mail do Gmail/Outlook — foi a causa real do link "expirando"
+     antes do bombeiro clicar, achado testando essa sessão). Nossa
+     página só consome o token quando a pessoa clica no botão
+     "Confirmar e continuar", uma ação real, não uma visita automática.
+
+     Usa {{ .SiteURL }}, NÃO {{ .RedirectTo }}: testado nesta sessão
+     (2026-08-29) e confirmado que este projeto/versão do GoTrue NÃO
+     honra o parâmetro redirect_to no endpoint de convite admin — o
+     link sempre renderizava a Site URL fixa independente do que fosse
+     passado (corpo, query param, com ou sem allowlist). Trocado pra
+     SiteURL, que é confiável. Consequência prática: SiteURL agora
+     precisa ser mantida igual ao ambiente ativo (Authentication → URL
+     Configuration → Site URL) — em produção isso é permanente (aponta
+     pro domínio real) e não muda mais; só em dev local/túnel é preciso
+     atualizar a cada troca de ambiente.
+-->
+<h2>Você foi convidado — Brigada Camarão</h2>
+<p>A coordenação da Brigada Camarão convidou você a se cadastrar no sistema de gestão.</p>
+<p>
+  <a href="{{ .SiteURL }}/convite?token_hash={{ .TokenHash }}&type=invite">Confirmar convite e continuar</a>
+</p>
+<p style="color:#7070a0;font-size:12px;">Se você não esperava este e-mail, pode ignorá-lo.</p>
