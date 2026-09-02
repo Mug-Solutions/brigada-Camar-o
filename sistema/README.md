@@ -1,22 +1,29 @@
 # Brigada Camarão — Sistema de Gestão
 
-Aplicação real (Next.js + Supabase) que substitui o protótipo estático em
-`../` — este é o início do desenvolvimento do projeto completo fechado na
-proposta comercial.
+Sistema real (Next.js + Supabase) de gestão de bombeiros civis para eventos:
+cadastro e compliance, clientes, eventos e escala, financeiro, Portal do
+Bombeiro (PWA) e um painel administrativo com autenticação e permissões por
+papel (staff/bombeiro).
 
 ## Stack
 
 - **Next.js 16** (App Router, Server Components, Server Actions)
 - **TypeScript**
 - **Tailwind CSS v4**
-- **Supabase** (Postgres) — acesso via chave de serviço no servidor (ver nota de segurança abaixo)
+- **Supabase** — Postgres, Auth e Storage. Toda tabela sensível tem Row Level
+  Security ligado; telas administrativas usam a chave de serviço no servidor
+  (nunca exposta ao navegador — ver `src/lib/supabase/server.ts`), telas do
+  Portal do Bombeiro usam a sessão do usuário logado, sujeita à RLS.
 
 ## Como rodar localmente
 
-1. Crie um projeto gratuito em [supabase.com](https://supabase.com).
-2. No SQL Editor do projeto, cole e execute o conteúdo de [`supabase/schema.sql`](./supabase/schema.sql).
-3. Copie `.env.example` para `.env.local` e preencha com os dados do seu
-   projeto (Project Settings → API): `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+1. Crie um projeto no [supabase.com](https://supabase.com) (ou use o já
+   existente do time).
+2. Aplique as migrações de [`supabase/migrations/`](./supabase/migrations/)
+   em ordem — pelo SQL Editor do Supabase ou pela CLI (`supabase db push`).
+3. Copie `.env.example` para `.env.local` e preencha com os dados do projeto
+   (Project Settings → API) e das integrações (Resend, cron secret) — cada
+   variável tem um comentário explicando pra que serve.
 4. Instale as dependências e suba o servidor:
 
    ```bash
@@ -24,32 +31,42 @@ proposta comercial.
    npm run dev
    ```
 
-5. Acesse `http://localhost:3000`.
+5. Acesse `http://localhost:3000`. Sem `.env.local` preenchido, o sistema
+   roda em modo de demonstração (dados fictícios, sem exigir login) — útil
+   pra ver a interface sem configurar nada.
 
-## O que já funciona
+## Testes
 
-- **Painel** — KPIs reais (bombeiros ativos, pendências de documento, eventos, faturamento), consultando o banco.
-- **Bombeiros** — listagem com status de ASO/E-Social/Credenciamento calculado automaticamente, e formulário de cadastro (Server Action, grava direto no Supabase).
-- **Eventos & Escalas** — listagem de eventos (leitura). Faltam: formulário de criação de evento e a tela de escala por turno.
-- **Financeiro** — página preparada, aguardando o módulo de Escalas para calcular custo/lucro automaticamente (mesma lógica já validada no protótipo).
+```bash
+npm run lint
+npm run build
+npx vitest run
+```
 
-## O que falta para o projeto completo
+## Deploy
 
-Conforme o escopo fechado na proposta:
+Pensado pra rodar como container no Cloud Run (Google Cloud) — passo a passo
+completo em [`docs/deploy-cloud-run.md`](./docs/deploy-cloud-run.md).
 
-- [ ] Formulário de criação de evento
-- [ ] Tela de escala por turno (com bloqueio de bombeiros com documento vencido)
-- [ ] Cálculo automático de custo/lucro por evento (módulo Financeiro)
-- [ ] Contas a pagar (bombeiros) / a receber (cliente) com atualização de status
-- [ ] Autenticação de usuários e controle de acesso por papel (operação / financeiro / direção) — ver Seção 9 do [levantamento de requisitos](../levantamento.html)
-- [ ] Migração dos dados reais das planilhas atuais para o Supabase
+```bash
+docker build -t brigada-camarao .
+docker run -p 8080:8080 --env-file .env.local brigada-camarao
+```
 
-## Nota de segurança
+## Estrutura
 
-Este projeto ainda **não tem autenticação de usuários**. Por isso as consultas
-usam a chave de serviço do Supabase (`SUPABASE_SERVICE_ROLE_KEY`), que roda
-exclusivamente no servidor (Server Components e Server Actions, nunca no
-navegador — reforçado pelo import `"server-only"` em
-[`src/lib/supabase/server.ts`](./src/lib/supabase/server.ts)). O Row Level
-Security do Postgres está propositalmente desligado até a autenticação ser
-implementada; não exponha esta chave no cliente nem a comite no repositório.
+- `src/app/(admin)/` — telas administrativas (staff): painel, bombeiros,
+  clientes, eventos & escalas, financeiro, preços, auditoria.
+- `src/app/portal/` — Portal do Bombeiro (PWA instalável): escala,
+  documentos, disponibilidade, dados pessoais.
+- `src/app/api/` — rotas HTTP: exportações CSV, job diário de vencimento de
+  documento, leitura segura de documento anexado.
+- `src/lib/` — regras de negócio e integrações (auth, e-mail, WhatsApp,
+  validação, cálculo financeiro).
+- `supabase/migrations/` — histórico incremental do schema, em ordem.
+
+## Histórico de decisões
+
+Todo trade-off de arquitetura, achado de segurança e decisão de escopo
+tomado durante a construção está registrado, com data e motivo, em
+[`../docs/decisoes-tecnicas.md`](../docs/decisoes-tecnicas.md).
