@@ -1,0 +1,21 @@
+# Roda na vm-crm. A imagem e' construida no GitHub Actions e enviada pro GHCR;
+# a VM so faz "docker compose pull" + "up" (nao builda nada aqui).
+services:
+  brigada:
+    image: ghcr.io/mug-solutions/brigada-camarao:latest
+    container_name: brigada
+    restart: unless-stopped
+    env_file: .env.local
+    expose:
+      - "8080"          # so interno; quem publica 80/443 e' o nginx-proxy
+    networks:
+      - web
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web:
+    external: true      # rede compartilhada criada pelo proxy
