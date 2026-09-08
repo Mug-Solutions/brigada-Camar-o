@@ -1,3 +1,4 @@
+import { LogoBadge } from "@/components/LogoBadge";
 import { DefinirSenhaForm } from "./DefinirSenhaForm";
 
 // O e-mail de convite (src/app/(admin)/bombeiros/aprovacoes/actions.ts,
@@ -20,13 +21,16 @@ export default async function ConvitePage({ searchParams }: PageProps<"/convite"
     <div className="flex min-h-screen w-full items-center justify-center p-6" style={{ background: "var(--bg)" }}>
       <div className="w-full max-w-[380px]">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div style={{ fontFamily: "var(--font-display)" }}>
-            <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
-              BRIGADA
-            </span>
-            <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
-              CAMARÃO
-            </span>
+          <div className="flex items-center gap-3">
+            <LogoBadge size={48} />
+            <div style={{ fontFamily: "var(--font-display)" }}>
+              <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
+                BRIGADA
+              </span>
+              <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
+                CAMARÃO
+              </span>
+            </div>
           </div>
           <p className="mt-2 max-w-[34ch] text-[12.5px]" style={{ color: "var(--text-faint)" }}>
             Você foi convidado pela coordenação. Confirme pra continuar.

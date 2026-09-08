@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/lib/auth/logout";
+import { LogoBadge } from "./LogoBadge";
 
 const NAV_ITEMS = [
   { href: "/painel", label: "Painel", icon: "◆" },
@@ -19,7 +20,8 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar flex min-h-screen w-[236px] shrink-0 flex-col p-4">
-      <div className="px-1.5 pb-2 pt-0.5">
+      <div className="mb-1 flex items-center gap-2.5 px-1.5 pb-2 pt-0.5">
+        <LogoBadge size={38} />
         <div className="flex flex-col" style={{ fontFamily: "var(--font-display)" }}>
           <span className="text-[15px] tracking-wide" style={{ color: "var(--shell-text-soft)" }}>
             BRIGADA

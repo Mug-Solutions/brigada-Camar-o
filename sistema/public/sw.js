@@ -4,8 +4,8 @@
 // um cache básico network-first pro Portal do Bombeiro, não offline
 // completo. Decisão registrada em docs/decisoes-tecnicas.md.
 
-const CACHE_NAME = "bc-portal-v1";
-const ESCOPO = ["/portal", "/manifest.webmanifest", "/icon.svg"];
+const CACHE_NAME = "bc-portal-v2";
+const ESCOPO = ["/portal", "/manifest.webmanifest", "/logo.jpg"];
 
 self.addEventListener("install", () => {
   self.skipWaiting();
