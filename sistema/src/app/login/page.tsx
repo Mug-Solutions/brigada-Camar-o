@@ -10,7 +10,6 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <div className="w-full max-w-[380px]">
         <div className="mb-6 flex flex-col items-center text-center">
           <div className="flex items-center gap-3">
-            <LogoBadge size={48} />
             <div style={{ fontFamily: "var(--font-display)" }}>
               <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
                 BRIGADA
@@ -19,10 +18,8 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
                 CAMARÃO
               </span>
             </div>
+            <LogoBadge size={48} />
           </div>
-          <p className="mt-2 text-[12.5px]" style={{ color: "var(--text-faint)" }}>
-            Acesso ao sistema de gestão
-          </p>
         </div>
         <LoginForm pendente={pendente} />
       </div>
