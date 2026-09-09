@@ -3,6 +3,7 @@ import { getSessionSupabaseClient } from "@/lib/supabase/server-auth";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { buscarFuncoesAtivas } from "@/lib/funcoes";
 import { FUNCOES } from "@/lib/constants";
+import { LogoBadge } from "@/components/LogoBadge";
 import { CompletarCadastroForm } from "./CompletarCadastroForm";
 
 export const dynamic = "force-dynamic";
@@ -33,13 +34,16 @@ export default async function CompletarCadastroPage() {
     <div className="flex min-h-screen w-full items-center justify-center p-6" style={{ background: "var(--bg)" }}>
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div style={{ fontFamily: "var(--font-display)" }}>
-            <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
-              BRIGADA
-            </span>
-            <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
-              CAMARÃO
-            </span>
+          <div className="flex items-center gap-3">
+            <LogoBadge size={48} />
+            <div style={{ fontFamily: "var(--font-display)" }}>
+              <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
+                BRIGADA
+              </span>
+              <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
+                CAMARÃO
+              </span>
+            </div>
           </div>
         </div>
 

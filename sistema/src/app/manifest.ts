@@ -6,9 +6,13 @@ import type { MetadataRoute } from "next";
  * instalável, mas ter o link de manifest presente em todo o app não
  * causa efeito nenhum fora do fluxo de instalação).
  *
- * icon.svg é um ícone provisório (iniciais "BC" sobre o fundo escuro da
- * marca) — trocar por PNG com padding de safe-zone maskable assim que
- * existir um ícone de marca definitivo (ver docs/decisoes-tecnicas.md).
+ * Ícone de marca definitivo fornecido pelo cliente (public/logo.jpg) —
+ * substitui o placeholder provisório de iniciais "BC". `purpose: "any"`
+ * (não "maskable") de propósito: a arte já preenche quase todo o
+ * quadro da imagem, sem a margem de safe-zone que um ícone maskable
+ * exige — declarar "maskable" faria o Android recortar as bordas do
+ * emblema. Sem ferramenta de edição de imagem disponível pra gerar uma
+ * versão com esse padding; se um dia existir, revisitar aqui.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -22,9 +26,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#c1440e",
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/logo.jpg",
+        sizes: "1291x1218",
+        type: "image/jpeg",
         purpose: "any",
       },
     ],

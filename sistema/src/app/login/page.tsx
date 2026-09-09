@@ -1,3 +1,4 @@
+import { LogoBadge } from "@/components/LogoBadge";
 import { LoginForm } from "./LoginForm";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -8,17 +9,17 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <div className="flex min-h-screen w-full items-center justify-center p-6" style={{ background: "var(--bg)" }}>
       <div className="w-full max-w-[380px]">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div style={{ fontFamily: "var(--font-display)" }}>
-            <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
-              BRIGADA
-            </span>
-            <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
-              CAMARÃO
-            </span>
+          <div className="flex items-center gap-3">
+            <div style={{ fontFamily: "var(--font-display)" }}>
+              <span className="block text-[15px] tracking-wide" style={{ color: "var(--text-soft)" }}>
+                BRIGADA
+              </span>
+              <span className="block text-[26px] leading-tight" style={{ color: "var(--accent)" }}>
+                CAMARÃO
+              </span>
+            </div>
+            <LogoBadge size={48} />
           </div>
-          <p className="mt-2 text-[12.5px]" style={{ color: "var(--text-faint)" }}>
-            Acesso ao sistema de gestão
-          </p>
         </div>
         <LoginForm pendente={pendente} />
       </div>
