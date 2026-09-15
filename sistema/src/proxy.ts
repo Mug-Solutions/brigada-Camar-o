@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { HOME_POR_PAPEL, type Papel } from "@/lib/constants";
+import { HOME_POR_PAPEL, PAPEIS, type Papel } from "@/lib/constants";
 import { ehAreaDoPapel, ehRotaProtegida } from "@/lib/auth/protected-routes";
 
 /**
@@ -8,6 +8,25 @@ import { ehAreaDoPapel, ehRotaProtegida } from "@/lib/auth/protected-routes";
  * novo — ver node_modules/next/dist/docs/.../proxy.md). Roda em runtime
  * Node por padrão nesta versão.
  */
+
+/**
+ * Lê papel/ativo das claims do próprio JWT, gravadas pelo Custom Access
+ * Token Hook (supabase/migrations/0022_auth_hook_papel_no_token.sql) —
+ * substitui a consulta em `usuarios` que rodava aqui a cada navegação
+ * (achado real: delay perceptível trocando de menu, porque essa é a
+ * MESMA pergunta repetida em toda rota protegida). Valida o formato
+ * antes de confiar: app_metadata ausente/malformado ou papel fora de
+ * PAPEIS é tratado como "sem acesso", nunca deixado passar.
+ */
+function papelAtivoDasClaims(appMetadata: unknown): { papel: Papel; ativo: boolean } | null {
+  if (typeof appMetadata !== "object" || appMetadata === null) return null;
+  const meta = appMetadata as Record<string, unknown>;
+  const papel = meta.papel;
+  const ativo = meta.ativo;
+  if (typeof papel !== "string" || !(PAPEIS as readonly string[]).includes(papel)) return null;
+  if (typeof ativo !== "boolean") return null;
+  return { papel: papel as Papel, ativo };
+}
 
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -46,42 +65,36 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() decodifica e verifica o próprio JWT (assinatura + validade).
+  // Com chave de assinatura assimétrica, verifica local, sem chamada de
+  // rede; com chave simétrica (o que este projeto usa hoje), ainda faz 1
+  // chamada — mas já vem com papel/ativo embutidos (hook), então a segunda
+  // ida ao banco que existia aqui antes deixa de ser necessária.
+  const { data: claimsData } = await supabase.auth.getClaims();
+  const acesso = claimsData ? papelAtivoDasClaims(claimsData.claims.app_metadata) : null;
 
   if (pathname === "/login") {
     // Já logado tentando ver a tela de login: manda direto pra home dele.
-    if (user) {
-      const { data: usuario } = await supabase
-        .from("usuarios")
-        .select("papel, ativo")
-        .eq("auth_id", user.id)
-        .maybeSingle();
-      if (usuario?.ativo) {
-        return NextResponse.redirect(new URL(HOME_POR_PAPEL[usuario.papel as Papel], request.url));
-      }
+    if (acesso?.ativo) {
+      return NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url));
     }
     return response;
   }
 
-  if (!user) {
+  if (!claimsData) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const { data: usuario } = await supabase
-    .from("usuarios")
-    .select("papel, ativo")
-    .eq("auth_id", user.id)
-    .maybeSingle();
-
-  // Sem linha em `usuarios`, ou cadastro ainda pendente de aprovação
-  // (Fase B): trata como não autorizado a entrar nas áreas protegidas.
-  if (!usuario || !usuario.ativo) {
+  // Sem linha em `usuarios` no momento em que o token foi emitido/renovado
+  // (conta ainda não aprovada, ou cadastro pendente — Fase B), papel fora
+  // do esperado, ou inativo: trata como não autorizado a entrar nas áreas
+  // protegidas. Essa informação fica tão fresca quanto o JWT (renovado a
+  // cada "JWT expiry limit" configurado no Supabase — ver decisão de
+  // encurtar esse valor em docs/decisoes-tecnicas.md), não mais a cada
+  // clique como antes.
+  if (!acesso || !acesso.ativo) {
     return NextResponse.redirect(new URL("/login?pendente=1", request.url));
   }
-
-  const papel = usuario.papel as Papel;
 
   // Bombeiro tentando abrir uma rota admin, ou staff tentando abrir o
   // Portal: manda cada um para a área do próprio papel. IMPORTANTE: staff
@@ -89,8 +102,8 @@ export async function proxy(request: NextRequest) {
   // home — checar só "pathname começa com a home" bloquearia staff de
   // acessar as outras 3 (bug real, pego testando no navegador com um
   // Supabase de verdade; em modo apresentação isso nunca roda).
-  if (!ehAreaDoPapel(papel, pathname)) {
-    return NextResponse.redirect(new URL(HOME_POR_PAPEL[papel], request.url));
+  if (!ehAreaDoPapel(acesso.papel, pathname)) {
+    return NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url));
   }
 
   return response;
