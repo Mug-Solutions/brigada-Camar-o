@@ -65,6 +65,26 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  /**
+   * getClaims() (e getUser() antes dele) pode renovar o token nos
+   * bastidores quando a sessão está perto de expirar — os cookies novos
+   * (access + refresh token rotacionados) ficam gravados em `response`
+   * via o setAll() acima. Um `NextResponse.redirect(...)` cria uma
+   * resposta do ZERO, sem esses cookies. Sem essa cópia, o navegador
+   * segue o redirect ainda com o refresh token ANTIGO (já consumido no
+   * servidor durante a rotação) — a próxima requisição falha ao tentar
+   * renovar, vira "sem sessão", redireciona nervoso de novo, e por aí
+   * vai: um ciclo de carregamento que nunca estabiliza. Achado real
+   * testando (2026-09-15): o bug já existia desde sempre nesse arquivo,
+   * mas quase nunca se manifestava com expiração de 1h — encurtar pra
+   * 10 min tornou a coincidência entre "renovar" e "redirecionar" muito
+   * mais frequente. Toda saída por redirect precisa passar por aqui.
+   */
+  function comCookiesAtualizados(destino: NextResponse): NextResponse {
+    response.cookies.getAll().forEach((cookie) => destino.cookies.set(cookie));
+    return destino;
+  }
+
   // getClaims() decodifica e verifica o próprio JWT (assinatura + validade).
   // Com chave de assinatura assimétrica, verifica local, sem chamada de
   // rede; com chave simétrica (o que este projeto usa hoje), ainda faz 1
@@ -76,13 +96,13 @@ export async function proxy(request: NextRequest) {
   if (pathname === "/login") {
     // Já logado tentando ver a tela de login: manda direto pra home dele.
     if (acesso?.ativo) {
-      return NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url));
+      return comCookiesAtualizados(NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url)));
     }
     return response;
   }
 
   if (!claimsData) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return comCookiesAtualizados(NextResponse.redirect(new URL("/login", request.url)));
   }
 
   // Sem linha em `usuarios` no momento em que o token foi emitido/renovado
@@ -93,7 +113,7 @@ export async function proxy(request: NextRequest) {
   // encurtar esse valor em docs/decisoes-tecnicas.md), não mais a cada
   // clique como antes.
   if (!acesso || !acesso.ativo) {
-    return NextResponse.redirect(new URL("/login?pendente=1", request.url));
+    return comCookiesAtualizados(NextResponse.redirect(new URL("/login?pendente=1", request.url)));
   }
 
   // Bombeiro tentando abrir uma rota admin, ou staff tentando abrir o
@@ -103,7 +123,7 @@ export async function proxy(request: NextRequest) {
   // acessar as outras 3 (bug real, pego testando no navegador com um
   // Supabase de verdade; em modo apresentação isso nunca roda).
   if (!ehAreaDoPapel(acesso.papel, pathname)) {
-    return NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url));
+    return comCookiesAtualizados(NextResponse.redirect(new URL(HOME_POR_PAPEL[acesso.papel], request.url)));
   }
 
   return response;
