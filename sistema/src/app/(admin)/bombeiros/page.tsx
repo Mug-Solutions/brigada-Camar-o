@@ -69,7 +69,7 @@ export default async function BombeirosPage() {
             Importar CSV
           </Link>
           <Link href="/bombeiros/aprovacoes" className="btn">
-            Aprovações pendentes
+            Convidar Bombeiro
           </Link>
           <Link href="/bombeiros/novo" className="btn btn--primary">
             + Novo Bombeiro
