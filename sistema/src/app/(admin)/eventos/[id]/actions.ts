@@ -10,6 +10,7 @@ import type { Bombeiro } from "@/lib/types";
 import { validarDadosEvento } from "../validacao";
 import { registrarAuditoria } from "@/lib/auditoria";
 import { revalidarTelasFinanceiras } from "@/lib/revalidar-financeiro";
+import { validarLinhaProgramacao } from "@/lib/documentos-cliente/dados";
 
 export type EscalaFormState = { error: string | null };
 export type EditarEventoState = { error: string | null };
@@ -383,4 +384,77 @@ export async function excluirEvento(formData: FormData): Promise<void> {
   revalidatePath("/eventos");
   revalidarTelasFinanceiras();
   redirect("/eventos");
+}
+
+export type ProgramacaoFormState = { error: string | null };
+
+/**
+ * Programação combinada com o cliente (migração 0023) — fonte da
+ * tabela DATA / HORÁRIO / CARGA HORÁRIA / QUANTIDADE do orçamento e do
+ * contrato em PDF. Independente das escalas: é o que foi contratado,
+ * não quem foi escalado.
+ */
+export async function adicionarProgramacao(
+  _prevState: ProgramacaoFormState,
+  formData: FormData
+): Promise<ProgramacaoFormState> {
+  const acesso = await requireStaff();
+  if (!acesso.ok) return { error: acesso.error };
+
+  const eventoId = String(formData.get("evento_id") ?? "").trim();
+  if (!eventoId) return { error: "Evento não informado." };
+
+  const supabase = createServerSupabaseClient();
+  const { data: evento, error: eventoError } = await supabase
+    .from("eventos")
+    .select("data_inicio, data_fim")
+    .eq("id", eventoId)
+    .maybeSingle();
+  if (eventoError || !evento) return { error: "Evento não encontrado." };
+
+  const validacao = validarLinhaProgramacao(
+    {
+      data: String(formData.get("data") ?? ""),
+      horaInicio: String(formData.get("hora_inicio") ?? ""),
+      horaFim: String(formData.get("hora_fim") ?? ""),
+      quantidade: String(formData.get("quantidade") ?? ""),
+    },
+    { dataInicio: evento.data_inicio, dataFim: evento.data_fim }
+  );
+  if (validacao.error !== null) return { error: validacao.error };
+  const { linha } = validacao;
+
+  const { error } = await supabase.from("evento_programacao").insert({
+    evento_id: eventoId,
+    data: linha.data,
+    hora_inicio: linha.horaInicio,
+    hora_fim: linha.horaFim,
+    quantidade: linha.quantidade,
+  });
+  if (error) return { error: `Erro ao salvar: ${error.message}` };
+
+  revalidatePath(`/eventos/${eventoId}`);
+  return { error: null };
+}
+
+export async function removerProgramacao(formData: FormData): Promise<void> {
+  const acesso = await requireStaff();
+  if (!acesso.ok) redirect("/login");
+
+  const programacaoId = String(formData.get("programacao_id") ?? "");
+  const eventoId = String(formData.get("evento_id") ?? "");
+  if (!programacaoId || !eventoId) redirect(`/eventos/${eventoId}?erro=1`);
+
+  const supabase = createServerSupabaseClient();
+  // Escopado a evento_id também, mesma disciplina de removerEscala.
+  const { data, error } = await supabase
+    .from("evento_programacao")
+    .delete()
+    .eq("id", programacaoId)
+    .eq("evento_id", eventoId)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) redirect(`/eventos/${eventoId}?erro=1`);
+
+  revalidatePath(`/eventos/${eventoId}`);
 }

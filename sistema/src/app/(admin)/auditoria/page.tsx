@@ -13,6 +13,7 @@ const ROTULO_ACAO: Record<AuditoriaLog["acao"], string> = {
   excluir: "Excluiu",
   aprovar: "Aprovou",
   recusar: "Recusou",
+  gerar: "Gerou",
 };
 
 const LIMITE = 200;
