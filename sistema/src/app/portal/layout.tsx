@@ -6,7 +6,7 @@ import { signOut } from "@/lib/auth/logout";
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col" style={{ background: "var(--bg)" }}>
+    <div className="flex min-h-dvh flex-col" style={{ background: "var(--bg)" }}>
       <RegisterSW />
       <header
         className="sticky top-0 z-10 flex items-center justify-between border-b px-4 py-3"
