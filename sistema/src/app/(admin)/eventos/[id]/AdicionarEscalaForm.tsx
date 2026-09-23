@@ -46,6 +46,9 @@ export function AdicionarEscalaForm({
   const [turno, setTurno] = useState(turnos[0]?.nome ?? "");
 
   const bombeirosPorId = useMemo(() => new Map(bombeiros.map((b) => [b.id, b])), [bombeiros]);
+  const nomeSelecionadoDePreEscalados = bombeiroSelecionadoId
+    ? bombeirosPorId.get(bombeiroSelecionadoId)?.nome
+    : undefined;
 
   // Fase 7 do roadmap: "sugestão automática de escala por
   // disponibilidade/proximidade". Disponibilidade = bombeiro tem uma
@@ -81,6 +84,16 @@ export function AdicionarEscalaForm({
   return (
     <form action={formAction}>
       <input type="hidden" name="evento_id" value={eventoId} />
+
+      {nomeSelecionadoDePreEscalados && (
+        <div
+          className="mb-4 rounded-md border px-3 py-2 text-[12.5px]"
+          style={{ borderColor: "var(--warn)", background: "var(--warn-bg)", color: "var(--warn)" }}
+        >
+          Falta confirmar: {nomeSelecionadoDePreEscalados} ainda não está escalado — revise data e turno abaixo e
+          clique em <strong>Escalar</strong> pra completar.
+        </div>
+      )}
 
       {state.error && (
         <div

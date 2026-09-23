@@ -206,6 +206,14 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
                           {i + 1}
                         </span>
                         {c.bombeiros?.nome ?? "—"}
+                        {apto && (
+                          <span
+                            className="rounded-full px-2 py-0.5 text-[10.5px] font-semibold"
+                            style={{ background: "var(--warn-bg)", color: "var(--warn)" }}
+                          >
+                            Pendente — falta data/turno
+                          </span>
+                        )}
                         {!apto && (
                           <span className="text-[11.5px]" style={{ color: "var(--crit)" }}>
                             · documentação vencida
