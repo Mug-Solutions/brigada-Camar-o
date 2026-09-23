@@ -130,12 +130,36 @@ export async function removerEscala(formData: FormData): Promise<void> {
     .delete()
     .eq("id", escalaId)
     .eq("evento_id", eventoId)
-    .select("id")
+    .select("id, bombeiro_id")
     .maybeSingle();
   if (error || !data) redirect(`/eventos/${eventoId}?erro=1`);
 
+  // Achado real testando: cancelar a escala não desfazia a candidatura
+  // que trouxe o bombeiro até ali. Sem isso, o evento nunca reaparecia
+  // como "vaga aberta" pra esse bombeiro no Portal (candidaturas tem
+  // índice único por evento+bombeiro — a linha antiga, mesmo com status
+  // sobrando, bloqueava tanto uma nova candidatura quanto o botão
+  // "Candidatar-se", que some pra quem já tem qualquer candidatura
+  // registrada, seja qual for o status). Removendo a candidatura junto,
+  // o bombeiro volta ao estado de "nunca se candidatou" e pode tentar
+  // de novo. Não falha a ação inteira se isso der erro — a escala já
+  // foi removida, que é o efeito principal pedido.
+  const { error: candidaturaError } = await supabase
+    .from("candidaturas")
+    .delete()
+    .eq("evento_id", eventoId)
+    .eq("bombeiro_id", data.bombeiro_id);
+  if (candidaturaError) {
+    console.error("[removerEscala] falha ao limpar candidatura associada", {
+      eventoId,
+      bombeiroId: data.bombeiro_id,
+      erro: candidaturaError,
+    });
+  }
+
   revalidatePath(`/eventos/${eventoId}`);
   revalidatePath("/eventos");
+  revalidatePath("/portal/escala");
   revalidarTelasFinanceiras();
 }
 
