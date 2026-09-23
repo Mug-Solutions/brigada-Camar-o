@@ -43,3 +43,11 @@ export const HOME_POR_PAPEL: Record<Papel, string> = {
   bombeiro: "/portal",
   staff: "/painel",
 };
+
+// Compartilhado entre o form de upload (client) e a validação da
+// Server Action (server) — precisa ficar bem abaixo do
+// serverActions.bodySizeLimit (next.config.ts) pra barrar o arquivo
+// ANTES de mandar pro servidor: acima do limite do body, o Next.js
+// rejeita com um 413 genérico antes da Server Action rodar, travando
+// a página numa tela de erro de rede em vez da mensagem amigável.
+export const TAMANHO_MAXIMO_DOCUMENTO_BYTES = 5 * 1024 * 1024; // 5MB — foto de celular de um documento físico cabe folgado

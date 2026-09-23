@@ -1,10 +1,10 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { TAMANHO_MAXIMO_DOCUMENTO_BYTES } from "@/lib/constants";
 
 export const TIPOS_DOCUMENTO_ANEXO = ["aso", "credenciamento", "curso"] as const;
 export type TipoDocumentoAnexo = (typeof TIPOS_DOCUMENTO_ANEXO)[number];
 
-const TAMANHO_MAXIMO_BYTES = 5 * 1024 * 1024; // 5MB — foto de celular de um documento físico cabe folgado
 const MIME_POR_EXTENSAO: Record<string, string> = {
   "application/pdf": "pdf",
   "image/jpeg": "jpg",
@@ -75,7 +75,7 @@ export async function enviarDocumentoBombeiro({
   if (!arquivo || arquivo.size === 0) {
     return { error: "Selecione um arquivo." };
   }
-  if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
+  if (arquivo.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
     return { error: "Arquivo maior que 5MB — comprima ou tire uma foto com menos resolução." };
   }
   const extensao = MIME_POR_EXTENSAO[arquivo.type];
