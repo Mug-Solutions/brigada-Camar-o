@@ -1,4 +1,5 @@
 import { LogoBadge } from "@/components/LogoBadge";
+import { TemaToggle } from "@/components/TemaToggle";
 import { LoginForm } from "./LoginForm";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
@@ -22,6 +23,9 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           </div>
         </div>
         <LoginForm pendente={pendente} />
+        <div className="mt-4 flex justify-center">
+          <TemaToggle variante="conteudo" />
+        </div>
       </div>
     </div>
   );

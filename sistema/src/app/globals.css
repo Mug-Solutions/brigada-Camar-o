@@ -25,34 +25,40 @@
   --neutral: #6b6259;
   --neutral-bg: #e9e2d4;
   --radius: 10px;
+  /* Barra de rolagem, <select>, date picker e afins seguem o tema. */
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15120e;
-    --surface: #1e1a15;
-    --surface-2: #241f18;
-    --text: #efe7d8;
-    --text-soft: #af9f8b;
-    --text-faint: #7d7061;
-    --line: #372e24;
-    --accent: #e0672a;
-    --accent-contrast: #1a1410;
-    --accent-tint: #3a2214;
-    --shell-bg: #0d0b08;
-    --shell-bg-2: #141110;
-    --shell-text: #efe7d8;
-    --shell-text-soft: #8f8172;
-    --shell-line: #2a2219;
-    --ok: #63b789;
-    --ok-bg: #173225;
-    --warn: #dba847;
-    --warn-bg: #332809;
-    --crit: #e37767;
-    --crit-bg: #3a1c17;
-    --neutral: #9a8f7e;
-    --neutral-bg: #241f18;
-  }
+/* Paleta escura: vale quando a pessoa escolhe, não quando o sistema
+   operacional está no escuro. O padrão é claro (ver src/lib/tema.ts) —
+   antes isto era um @media (prefers-color-scheme: dark), que decidia
+   pela pessoa e não dava como voltar. O atributo é gravado no <html>
+   antes da primeira pintura pelo script em src/app/layout.tsx. */
+:root[data-tema="escuro"] {
+  --bg: #15120e;
+  --surface: #1e1a15;
+  --surface-2: #241f18;
+  --text: #efe7d8;
+  --text-soft: #af9f8b;
+  --text-faint: #7d7061;
+  --line: #372e24;
+  --accent: #e0672a;
+  --accent-contrast: #1a1410;
+  --accent-tint: #3a2214;
+  --shell-bg: #0d0b08;
+  --shell-bg-2: #141110;
+  --shell-text: #efe7d8;
+  --shell-text-soft: #8f8172;
+  --shell-line: #2a2219;
+  --ok: #63b789;
+  --ok-bg: #173225;
+  --warn: #dba847;
+  --warn-bg: #332809;
+  --crit: #e37767;
+  --crit-bg: #3a1c17;
+  --neutral: #9a8f7e;
+  --neutral-bg: #241f18;
+  color-scheme: dark;
 }
 
 @theme inline {

@@ -9,6 +9,10 @@ import { AdicionarEscalaForm } from "./AdicionarEscalaForm";
 import { EscalaTabela } from "./EscalaTabela";
 import { ExcluirEventoButton } from "./ExcluirEventoButton";
 import { aceitarCandidatura, recusarCandidatura } from "./actions";
+import { carregarDadosDocumento } from "@/lib/documentos-cliente/carregar";
+import { pendenciasDocumento } from "@/lib/documentos-cliente/dados";
+import { ProgramacaoEvento } from "./ProgramacaoEvento";
+import { DocumentosCliente } from "./DocumentosCliente";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +23,8 @@ const MENSAGENS_ERRO: Record<string, string> = {
   "1": "Não foi possível concluir a ação. Tente novamente.",
   "financeiro-fechado":
     "Não é possível excluir: já existe pagamento/recebimento fechado ou ponto registrado em algum turno deste evento.",
+  "documento-orcamento": "Não foi possível gerar o orçamento — veja o que falta em \"Documentos para o cliente\".",
+  "documento-contrato": "Não foi possível gerar o contrato — veja o que falta em \"Documentos para o cliente\".",
 };
 
 export default async function EventoDetalhePage({ params, searchParams }: PageProps<"/eventos/[id]">) {
@@ -50,6 +56,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
     { data: bombeirosData },
     { data: candidaturasData },
     { data: disponibilidadesData },
+    documento,
   ] = await Promise.all([
     supabase.from("eventos").select("*, clientes(nome)").eq("id", id).maybeSingle(),
     supabase
@@ -73,6 +80,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
     // formulário em vez de fazer um segundo round-trip dependente dos
     // bombeiros aptos.
     supabase.from("disponibilidades").select("bombeiro_id, dia_semana, turno, regiao"),
+    carregarDadosDocumento(supabase, id),
   ]);
 
   if (!evento) notFound();
@@ -140,6 +148,11 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
           {mensagemErro}
         </div>
       )}
+      {documento.ok === false && documento.motivo === "erro" && (
+        <div className="panel-block mb-4 p-4 text-[13px]" style={{ color: "var(--crit)" }}>
+          Erro ao carregar programação/documentos: {documento.mensagem}
+        </div>
+      )}
       {escalasError && (
         <div className="panel-block mb-4 p-4 text-[13px]" style={{ color: "var(--crit)" }}>
           Erro ao carregar escala: {escalasError.message}
@@ -147,6 +160,16 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
       )}
       <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_360px]">
         <div>
+          {documento.ok && (
+            <div className="mb-4">
+              <ProgramacaoEvento
+                eventoId={id}
+                dataInicio={eventoTyped.data_inicio}
+                dataFim={eventoTyped.data_fim}
+                linhas={documento.programacao}
+              />
+            </div>
+          )}
           <EscalaTabela
             titulo="Titulares"
             linhas={titulares}
@@ -203,6 +226,15 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
         </div>
 
         <div>
+          {documento.ok && (
+            <DocumentosCliente
+              eventoId={id}
+              pendencias={{
+                orcamento: pendenciasDocumento("orcamento", documento.dados),
+                contrato: pendenciasDocumento("contrato", documento.dados),
+              }}
+            />
+          )}
           {candidaturasPendentes.length > 0 && (
             <div className="panel-block mb-4 p-5">
               <h2 className="mb-3.5 text-[13px] font-semibold uppercase tracking-wide" style={{ fontFamily: "var(--font-display)" }}>

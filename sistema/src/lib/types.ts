@@ -63,6 +63,19 @@ export interface Escala {
   created_at: string;
 }
 
+/** Linha da programação combinada com o cliente (migração 0023) — fonte
+ * da tabela do orçamento e do contrato. hora_fim < hora_inicio quer
+ * dizer que atravessa a meia-noite. */
+export interface EventoProgramacao {
+  id: string;
+  evento_id: string;
+  data: string; // ISO date
+  hora_inicio: string; // "HH:MM:SS" (tipo time do Postgres)
+  hora_fim: string;
+  quantidade: number;
+  created_at: string;
+}
+
 export interface EventoFinanceiro {
   evento_id: string;
   pago_bombeiros_data: string | null;
@@ -112,7 +125,7 @@ export interface AuditoriaLog {
   usuario_id: string | null;
   tabela: string;
   registro_id: string | null;
-  acao: "criar" | "editar" | "excluir" | "aprovar" | "recusar";
+  acao: "criar" | "editar" | "excluir" | "aprovar" | "recusar" | "gerar";
   valor_antes: Record<string, unknown> | null;
   valor_depois: Record<string, unknown> | null;
   criado_em: string;
