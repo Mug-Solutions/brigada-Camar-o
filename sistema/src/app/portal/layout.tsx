@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { PortalNav } from "@/components/PortalNav";
 import { RegisterSW } from "@/components/RegisterSW";
 import { LogoBadge } from "@/components/LogoBadge";
+import { TemaToggle } from "@/components/TemaToggle";
 import { signOut } from "@/lib/auth/logout";
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
@@ -23,11 +24,14 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
             </span>
           </div>
         </div>
-        <form action={signOut}>
-          <button type="submit" className="text-[11px] font-semibold" style={{ color: "var(--shell-text-soft)" }}>
-            Sair
-          </button>
-        </form>
+        <div className="flex items-center gap-1">
+          <TemaToggle compacto />
+          <form action={signOut}>
+            <button type="submit" className="text-[11px] font-semibold" style={{ color: "var(--shell-text-soft)" }}>
+              Sair
+            </button>
+          </form>
+        </div>
       </header>
       <main className="flex-1 px-4 py-5 pb-24">{children}</main>
       <PortalNav />
