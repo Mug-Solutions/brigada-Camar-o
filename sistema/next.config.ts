@@ -17,6 +17,14 @@ const nextConfig: NextConfig = {
   // standalone determinístico em qualquer ambiente, sem depender de
   // inferência — e é a prática recomendada pra esse tipo de output.
   outputFileTracingRoot: path.join(__dirname),
+  // Imagens do orçamento/contrato em PDF (logo, selo, assinatura) são
+  // lidas com fs em runtime (src/lib/documentos-cliente/imagens.ts) —
+  // nada as importa, então o trace não as copiaria pro standalone
+  // sozinho. Ficam fora de public/ de propósito: a assinatura do
+  // representante não pode ser baixável por URL.
+  outputFileTracingIncludes: {
+    "/api/eventos/**": ["./assets/documentos/**/*"],
+  },
   experimental: {
     serverActions: {
       // Precisa cobrir os dois maiores uploads do sistema: import de CSV
