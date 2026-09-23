@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { TemaToggle } from "@/components/TemaToggle";
 import { signOut } from "@/lib/auth/logout";
 import { LogoBadge } from "./LogoBadge";
 
@@ -130,7 +131,11 @@ export function Sidebar() {
         })}
       </nav>
 
-      <form action={signOut} className="mt-auto pt-4">
+      <div className="mt-auto pt-4">
+        <TemaToggle compacto={recolhida} />
+      </div>
+
+      <form action={signOut}>
         <button
           type="submit"
           title={recolhida ? "Sair" : undefined}
