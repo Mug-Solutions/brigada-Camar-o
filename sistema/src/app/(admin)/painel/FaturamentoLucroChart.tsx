@@ -20,9 +20,14 @@ export function FaturamentoLucroChart({ dados }: { dados: PontoSerieMensal[] }) 
   return (
     <div className="h-[280px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={dados} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+        <LineChart data={dados} margin={{ top: 8, right: 24, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
-          <XAxis dataKey="mes" tick={{ fill: "var(--text-soft)", fontSize: 12 }} axisLine={{ stroke: "var(--line)" }} />
+          <XAxis
+            dataKey="mes"
+            tick={{ fill: "var(--text-soft)", fontSize: 12 }}
+            axisLine={{ stroke: "var(--line)" }}
+            padding={{ right: 12 }}
+          />
           <YAxis
             tick={{ fill: "var(--text-soft)", fontSize: 12 }}
             axisLine={{ stroke: "var(--line)" }}
