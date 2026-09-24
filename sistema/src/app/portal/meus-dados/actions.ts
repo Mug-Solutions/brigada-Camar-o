@@ -125,6 +125,14 @@ export async function atualizarMeusDados(
   });
 
   revalidatePath("/portal/meus-dados");
+  // Achado real: telefone/chave_pix também aparecem em /financeiro/[id]
+  // e /financeiro/[id]/pix (a tela de pagamento PIX) — sem revalidar
+  // essas rotas, o admin via um valor desatualizado até dar refresh
+  // manual, mesmo com a gravação já correta no banco. `"page"` invalida
+  // TODOS os eventos que casam com o template, já que não dá pra saber
+  // daqui em quais eventos esse bombeiro está escalado.
+  revalidatePath("/financeiro/[id]", "page");
+  revalidatePath("/financeiro/[id]/pix", "page");
   return { error: null, sucesso: true };
 }
 
