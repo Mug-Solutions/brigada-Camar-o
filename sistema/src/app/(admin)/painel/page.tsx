@@ -2,16 +2,19 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/lib/auth/session";
-import { bombeiroAptidao, docStatus, fmtDateBR, fmtMoney } from "@/lib/domain";
+import { bombeiroAptidao, docStatus, fmtDateBR } from "@/lib/domain";
 import { buscarPrecoAlimentacao } from "@/lib/precos";
 import { MOCK_BOMBEIROS, MOCK_EVENTOS } from "@/lib/mock-data";
 import { DemoBanner } from "@/components/DemoBanner";
-import { calcularLinhasFinanceiro, type EventoFinanceiroRow } from "../financeiro/calculo";
+import { agruparFinanceiro, calcularLinhasFinanceiro, chaveMes, type EventoFinanceiroRow } from "../financeiro/calculo";
+import { FaturamentoLucroChart, type PontoSerieMensal } from "./FaturamentoLucroChart";
 import type { Bombeiro, Evento } from "@/lib/types";
 
 type AlertaPendente = { texto: string; href: string };
 
 export const dynamic = "force-dynamic";
+
+const MESES_HISTORICO_GRAFICO = 6;
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
@@ -35,13 +38,6 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub: string 
   );
 }
 
-function variacaoTexto(atual: number, anterior: number): string {
-  if (anterior === 0) return atual > 0 ? "sem base de comparação" : "igual ao mês passado";
-  const variacao = ((atual - anterior) / anterior) * 100;
-  const sinal = variacao >= 0 ? "+" : "";
-  return `${sinal}${variacao.toFixed(0)}% vs. mês passado`;
-}
-
 export default async function PainelPage() {
   const acesso = await requireStaff();
   if (!acesso.ok) redirect("/login");
@@ -51,10 +47,7 @@ export default async function PainelPage() {
 
   let bombeiros: Bombeiro[] = MOCK_BOMBEIROS;
   let eventos: Evento[] = MOCK_EVENTOS;
-  let lucroMesAtual = 0;
-  let lucroMesAnterior = 0;
-  let faturamentoMesAtual = 0;
-  let faturamentoMesAnterior = 0;
+  let serieMensal: PontoSerieMensal[] = [];
   let proximosEventos: { id: string; nome: string; data_inicio: string; cliente: string }[] = [];
   let alertas: AlertaPendente[] = [];
 
@@ -83,20 +76,21 @@ export default async function PainelPage() {
     );
 
     const hoje = new Date();
-    const mesAtual = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
-    const mesAnteriorData = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
-    const mesAnterior = `${mesAnteriorData.getFullYear()}-${String(mesAnteriorData.getMonth() + 1).padStart(2, "0")}`;
 
-    for (const l of linhas) {
-      const mesDoEvento = l.dataInicio.slice(0, 7);
-      if (mesDoEvento === mesAtual) {
-        faturamentoMesAtual += l.receita;
-        lucroMesAtual += l.receita - l.custo;
-      } else if (mesDoEvento === mesAnterior) {
-        faturamentoMesAnterior += l.receita;
-        lucroMesAnterior += l.receita - l.custo;
-      }
-    }
+    // Últimos N meses corridos (inclusive os sem evento nenhum, com
+    // faturamento/lucro zerados) — uma série contínua fica mais fácil
+    // de ler num gráfico de linha do que só os meses que por acaso
+    // tiveram evento. Reaproveita agruparFinanceiro/chaveMes (mesmo
+    // cálculo do DRE), só reamostrado num calendário fixo.
+    const porMes = agruparFinanceiro(linhas, (l) => chaveMes(l.dataInicio));
+    const porMesMap = new Map(porMes.map((g) => [g.chave, g]));
+    serieMensal = Array.from({ length: MESES_HISTORICO_GRAFICO }, (_, i) => {
+      const data = new Date(hoje.getFullYear(), hoje.getMonth() - (MESES_HISTORICO_GRAFICO - 1 - i), 1);
+      const isoPrimeiroDia = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-01`;
+      const { chave, label } = chaveMes(isoPrimeiroDia);
+      const grupo = porMesMap.get(chave);
+      return { mes: label, faturamento: grupo?.receita ?? 0, lucro: grupo ? grupo.receita - grupo.custo : 0 };
+    });
 
     const hojeIso = hoje.toISOString().slice(0, 10);
     proximosEventos = (eventos as unknown as (Evento & { clientes: { nome: string } | null })[])
@@ -171,30 +165,24 @@ export default async function PainelPage() {
 
       {demo && <DemoBanner />}
 
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Kpi label="Bombeiros Ativos" value={`${ativos} / ${bombeiros.length}`} sub="cadastrados no quadro" />
         <Kpi label="Pendências de Documento" value={String(pendencias)} sub={pendencias ? "requer atenção" : "tudo em dia"} />
         <Kpi label="Eventos Confirmados" value={String(confirmados)} sub="no período" />
         <Kpi label="Em Planejamento" value={String(planejamento)} sub="aguardando confirmação" />
-        <Kpi
-          label="Faturamento do Mês"
-          value={fmtMoney(faturamentoMesAtual)}
-          sub={variacaoTexto(faturamentoMesAtual, faturamentoMesAnterior)}
-        />
-        <Kpi
-          label="Lucro do Mês"
-          value={fmtMoney(lucroMesAtual)}
-          sub={variacaoTexto(lucroMesAtual, lucroMesAnterior)}
-        />
       </div>
 
-      <p className="mb-7 text-[12px]" style={{ color: "var(--text-faint)" }}>
-        Comparativos por trimestre/ano e por cliente:{" "}
-        <Link href="/financeiro/dre" className="underline">
-          ver DRE
-        </Link>
-        .
-      </p>
+      <div className="mb-6 panel-block p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-[12px] font-semibold uppercase tracking-wide" style={{ color: "var(--text-soft)" }}>
+            Faturamento e Lucro — últimos {MESES_HISTORICO_GRAFICO} meses
+          </h2>
+          <Link href="/financeiro/dre" className="text-[12px] underline" style={{ color: "var(--text-faint)" }}>
+            ver DRE completo
+          </Link>
+        </div>
+        <FaturamentoLucroChart dados={serieMensal} />
+      </div>
 
       {!demo && bombeiros.length === 0 && eventos.length === 0 && (
         <div className="panel-block p-6 text-[13.5px]" style={{ color: "var(--text-soft)" }}>

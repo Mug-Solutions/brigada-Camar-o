@@ -50,3 +50,52 @@ export function calcularLinhasFinanceiro(
     };
   });
 }
+
+export interface GrupoFinanceiro {
+  chave: string;
+  label: string;
+  eventos: number;
+  receita: number;
+  custo: number;
+}
+
+/** `chave` precisa ser ordenável como string (ISO-like: "2026-08",
+ * "2026-Q3", "2026") — `label` é só o texto exibido. Bug real
+ * corrigido aqui: agrupar direto por "Ago/2026" e ordenar como string
+ * dava ordem alfabética ("Abr" antes de "Ago" antes de "Dez"...), não
+ * cronológica. Compartilhado entre /financeiro/dre e /painel (gráficos
+ * de faturamento/lucro por mês) — mesmo cálculo, sem duplicar.
+ */
+export function agruparFinanceiro(
+  linhas: LinhaFinanceiro[],
+  chaveDe: (l: LinhaFinanceiro) => { chave: string; label: string }
+): GrupoFinanceiro[] {
+  const grupos = new Map<string, GrupoFinanceiro>();
+  for (const l of linhas) {
+    const { chave, label } = chaveDe(l);
+    const atual = grupos.get(chave) ?? { chave, label, eventos: 0, receita: 0, custo: 0 };
+    atual.eventos += 1;
+    atual.receita += l.receita;
+    atual.custo += l.custo;
+    grupos.set(chave, atual);
+  }
+  return Array.from(grupos.values()).sort((a, b) => (a.chave < b.chave ? 1 : a.chave > b.chave ? -1 : 0));
+}
+
+const NOMES_MES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+export function chaveMes(dataIso: string): { chave: string; label: string } {
+  const [anoStr, mesStr] = dataIso.split("-");
+  return { chave: `${anoStr}-${mesStr}`, label: `${NOMES_MES[Number(mesStr) - 1]}/${anoStr}` };
+}
+
+export function chaveTrimestre(dataIso: string): { chave: string; label: string } {
+  const [anoStr, mesStr] = dataIso.split("-");
+  const trimestre = Math.ceil(Number(mesStr) / 3);
+  return { chave: `${anoStr}-Q${trimestre}`, label: `T${trimestre}/${anoStr}` };
+}
+
+export function chaveAno(dataIso: string): { chave: string; label: string } {
+  const anoStr = dataIso.split("-")[0];
+  return { chave: anoStr, label: anoStr };
+}

@@ -5,57 +5,18 @@ import { requireStaff } from "@/lib/auth/session";
 import { fmtMoney } from "@/lib/domain";
 import { DemoBanner } from "@/components/DemoBanner";
 import { buscarPrecoAlimentacao } from "@/lib/precos";
-import { calcularLinhasFinanceiro, type EventoFinanceiroRow } from "../calculo";
+import {
+  calcularLinhasFinanceiro,
+  agruparFinanceiro,
+  chaveMes,
+  chaveTrimestre,
+  chaveAno,
+  type EventoFinanceiroRow,
+  type GrupoFinanceiro,
+} from "../calculo";
 import type { LinhaFinanceiro } from "../FinanceiroTabela";
 
 export const dynamic = "force-dynamic";
-
-interface GrupoDRE {
-  chave: string;
-  label: string;
-  eventos: number;
-  receita: number;
-  custo: number;
-}
-
-/** `chave` precisa ser ordenável como string (ISO-like: "2026-08",
- * "2026-Q3", "2026") — `label` é só o texto exibido. Bug real
- * corrigido aqui: agrupar direto por "Ago/2026" e ordenar como string
- * dava ordem alfabética ("Abr" antes de "Ago" antes de "Dez"...), não
- * cronológica. */
-function agrupar(
-  linhas: LinhaFinanceiro[],
-  chaveDe: (l: LinhaFinanceiro) => { chave: string; label: string }
-): GrupoDRE[] {
-  const grupos = new Map<string, GrupoDRE>();
-  for (const l of linhas) {
-    const { chave, label } = chaveDe(l);
-    const atual = grupos.get(chave) ?? { chave, label, eventos: 0, receita: 0, custo: 0 };
-    atual.eventos += 1;
-    atual.receita += l.receita;
-    atual.custo += l.custo;
-    grupos.set(chave, atual);
-  }
-  return Array.from(grupos.values()).sort((a, b) => (a.chave < b.chave ? 1 : a.chave > b.chave ? -1 : 0));
-}
-
-const NOMES_MES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-
-function chaveMes(dataIso: string): { chave: string; label: string } {
-  const [anoStr, mesStr] = dataIso.split("-");
-  return { chave: `${anoStr}-${mesStr}`, label: `${NOMES_MES[Number(mesStr) - 1]}/${anoStr}` };
-}
-
-function chaveTrimestre(dataIso: string): { chave: string; label: string } {
-  const [anoStr, mesStr] = dataIso.split("-");
-  const trimestre = Math.ceil(Number(mesStr) / 3);
-  return { chave: `${anoStr}-Q${trimestre}`, label: `T${trimestre}/${anoStr}` };
-}
-
-function chaveAno(dataIso: string): { chave: string; label: string } {
-  const anoStr = dataIso.split("-")[0];
-  return { chave: anoStr, label: anoStr };
-}
 
 export default async function DrePage() {
   const acesso = await requireStaff();
@@ -86,12 +47,12 @@ export default async function DrePage() {
     );
   }
 
-  const porCliente = agrupar(linhas, (l) => ({ chave: l.cliente, label: l.cliente })).sort(
+  const porCliente = agruparFinanceiro(linhas, (l) => ({ chave: l.cliente, label: l.cliente })).sort(
     (a, b) => b.receita - a.receita
   );
-  const porMes = agrupar(linhas, (l) => chaveMes(l.dataInicio));
-  const porTrimestre = agrupar(linhas, (l) => chaveTrimestre(l.dataInicio));
-  const porAno = agrupar(linhas, (l) => chaveAno(l.dataInicio));
+  const porMes = agruparFinanceiro(linhas, (l) => chaveMes(l.dataInicio));
+  const porTrimestre = agruparFinanceiro(linhas, (l) => chaveTrimestre(l.dataInicio));
+  const porAno = agruparFinanceiro(linhas, (l) => chaveAno(l.dataInicio));
 
   return (
     <div>
@@ -145,7 +106,7 @@ export default async function DrePage() {
   );
 }
 
-function GrupoTabela({ grupos, vazio }: { grupos: GrupoDRE[]; vazio: string }) {
+function GrupoTabela({ grupos, vazio }: { grupos: GrupoFinanceiro[]; vazio: string }) {
   return (
     <div className="panel-block">
       <div className="overflow-x-auto">
