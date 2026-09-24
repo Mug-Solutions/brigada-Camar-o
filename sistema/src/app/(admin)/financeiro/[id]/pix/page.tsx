@@ -2,10 +2,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/lib/auth/session";
-import { fmtDateBR, fmtMoney } from "@/lib/domain";
+import { fmtDateBR } from "@/lib/domain";
 import { gerarPixBombeiro } from "@/lib/pix";
-import { MarcarPagoCheckbox } from "../MarcarPagoCheckbox";
-import { CopiarPixButton } from "./CopiarPixButton";
+import { PixListaBombeiros, type ItemPix } from "./PixListaBombeiros";
 
 export const dynamic = "force-dynamic";
 
@@ -105,50 +104,25 @@ export default async function PixEventoPage({ params, searchParams }: PageProps<
           Nenhum titular escalado neste evento ainda.
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {linhas.map((l) => {
-            const pixGerado = pixPorEscala.get(l.id);
-            return (
-              <div key={l.id} className="panel-block p-5">
-                <div className="mb-3 flex items-start justify-between gap-2">
-                  <div>
-                    <div className="font-semibold">{l.bombeiros?.nome ?? "—"}</div>
-                    <div className="mt-0.5 text-[12.5px]" style={{ color: "var(--text-soft)" }}>
-                      {fmtDateBR(l.data)} · {l.turno} · {fmtMoney(Number(l.valor))}
-                    </div>
-                  </div>
-                  <MarcarPagoCheckbox escalaId={l.id} eventoId={id} pago={l.pago} />
-                </div>
-
-                {!l.bombeiros?.chave_pix ? (
-                  <p className="text-[13px]" style={{ color: "var(--warn)" }}>
-                    Sem chave PIX cadastrada — não dá pra pagar até isso ser preenchido.
-                  </p>
-                ) : !pixGerado || pixGerado.error !== null ? (
-                  <p className="text-[13px]" style={{ color: "var(--crit)" }}>
-                    Não foi possível gerar o PIX: {pixGerado?.error ?? "erro desconhecido"}.
-                  </p>
-                ) : (
-                  <div className="flex flex-col items-center gap-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={pixGerado.qrCodeImage}
-                      alt={`QR code PIX de ${l.bombeiros.nome}`}
-                      className="h-[180px] w-[180px]"
-                    />
-                    <CopiarPixButton brCode={pixGerado.brCode} />
-                    <p
-                      className="w-full break-all rounded-md border p-2 text-center text-[10.5px]"
-                      style={{ borderColor: "var(--line)", color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}
-                    >
-                      {pixGerado.brCode}
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
+        <PixListaBombeiros
+          eventoId={id}
+          itens={linhas.map((l): ItemPix => {
+            const gerado = pixPorEscala.get(l.id);
+            return {
+              id: l.id,
+              nomeBombeiro: l.bombeiros?.nome ?? "—",
+              chavePix: l.bombeiros?.chave_pix ?? null,
+              data: l.data,
+              turno: l.turno,
+              valor: Number(l.valor),
+              pago: l.pago,
+              pix:
+                !gerado || gerado.error !== null
+                  ? { erro: gerado?.error ?? "erro desconhecido" }
+                  : { erro: null, brCode: gerado.brCode, qrCodeImage: gerado.qrCodeImage },
+            };
           })}
-        </div>
+        />
       )}
     </div>
   );
