@@ -14,6 +14,12 @@ interface NovoBombeiroFormProps {
   funcoes: string[];
 }
 
+const CAMPOS_ARQUIVO: { campo: string; label: string }[] = [
+  { campo: "foto_rosto", label: "foto" },
+  { campo: "aso_documento", label: "arquivo do ASO" },
+  { campo: "credenciamento_documento", label: "arquivo do Credenciamento" },
+];
+
 export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
   const [state, formAction, pending] = useActionState(criarBombeiro, initialState);
   const [erroFoto, setErroFoto] = useState<string | null>(null);
@@ -22,25 +28,34 @@ export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
   return (
     <form
       action={async (formData) => {
-        // Mesmo achado do autocadastro (CompletarCadastroForm.tsx): uma
-        // foto de celular em resolução máxima passa fácil do limite do
-        // body das Server Actions — comprime aqui antes de enviar.
-        const foto = formData.get("foto_rosto");
-        if (foto instanceof File && foto.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
-          setComprimindo(true);
-          try {
-            const comprimida = await comprimirImagemSeNecessario(foto, TAMANHO_MAXIMO_DOCUMENTO_BYTES);
-            if (comprimida.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
-              setErroFoto(`Não foi possível reduzir a foto abaixo de ${TAMANHO_MAXIMO_MB}MB — tire com menos zoom.`);
-              setComprimindo(false);
+        // Mesmo achado do autocadastro (CompletarCadastroForm.tsx): um
+        // arquivo de celular em resolução máxima passa fácil do limite do
+        // body das Server Actions — comprime cada campo de imagem aqui
+        // antes de enviar. PDF não dá pra comprimir no navegador — só
+        // bloqueia com mensagem clara.
+        setComprimindo(true);
+        try {
+          for (const { campo, label } of CAMPOS_ARQUIVO) {
+            const arquivo = formData.get(campo);
+            if (!(arquivo instanceof File) || arquivo.size <= TAMANHO_MAXIMO_DOCUMENTO_BYTES) continue;
+
+            if (arquivo.type === "application/pdf") {
+              setErroFoto(`O ${label} (PDF) passa de ${TAMANHO_MAXIMO_MB}MB — comprima o arquivo antes de enviar.`);
               return;
             }
-            formData.set("foto_rosto", comprimida);
-          } catch {
-            // Mantém a original — o erro amigável de tamanho do servidor cobre esse caso.
-          } finally {
-            setComprimindo(false);
+            try {
+              const comprimido = await comprimirImagemSeNecessario(arquivo, TAMANHO_MAXIMO_DOCUMENTO_BYTES);
+              if (comprimido.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
+                setErroFoto(`Não foi possível reduzir o ${label} abaixo de ${TAMANHO_MAXIMO_MB}MB — tire com menos zoom.`);
+                return;
+              }
+              formData.set(campo, comprimido);
+            } catch {
+              // Mantém o original — o erro amigável de tamanho do servidor cobre esse caso.
+            }
           }
+        } finally {
+          setComprimindo(false);
         }
         setErroFoto(null);
         await formAction(formData);
@@ -131,12 +146,34 @@ export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
           <input type="date" id="aso_data" name="aso_data" required />
         </div>
         <div className="field mb-4">
+          <label htmlFor="aso_documento">Arquivo do ASO</label>
+          <input
+            type="file"
+            id="aso_documento"
+            name="aso_documento"
+            accept="application/pdf,image/jpeg,image/png"
+            required
+            onChange={() => setErroFoto(null)}
+          />
+        </div>
+        <div className="field mb-4">
           <label htmlFor="esocial_matricula">Matrícula E-Social</label>
           <input type="text" id="esocial_matricula" name="esocial_matricula" placeholder="Ex.: 822" required />
         </div>
-        <div className="field">
+        <div className="field mb-4">
           <label htmlFor="credenciamento_data">Validade do Credenciamento</label>
           <input type="date" id="credenciamento_data" name="credenciamento_data" required />
+        </div>
+        <div className="field">
+          <label htmlFor="credenciamento_documento">Arquivo do Credenciamento</label>
+          <input
+            type="file"
+            id="credenciamento_documento"
+            name="credenciamento_documento"
+            accept="application/pdf,image/jpeg,image/png"
+            required
+            onChange={() => setErroFoto(null)}
+          />
         </div>
       </fieldset>
 
@@ -164,7 +201,7 @@ export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
           Cancelar
         </Link>
         <button type="submit" className="btn btn--primary" disabled={pending || comprimindo}>
-          {comprimindo ? "Compactando foto..." : pending ? "Salvando..." : "Salvar Bombeiro"}
+          {comprimindo ? "Preparando arquivos..." : pending ? "Salvando..." : "Salvar Bombeiro"}
         </button>
       </div>
     </form>

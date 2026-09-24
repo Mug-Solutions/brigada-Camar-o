@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cpfTemFormatoValido, telefoneTemFormatoValido } from "@/lib/validation/documento";
 import { comecaComCaractereFormula } from "@/lib/validation/csv-seguro";
 import { enviarFotoRosto } from "@/lib/foto-rosto";
+import { enviarDocumentoCadastro } from "@/lib/documentos";
 
 export type CompletarCadastroState = { error: string | null };
 
@@ -35,12 +36,20 @@ export async function enviarDadosCadastro(
   const credenciamentoData = String(formData.get("credenciamento_data") ?? "").trim();
   const chavePix = String(formData.get("chave_pix") ?? "").trim();
   const fotoRosto = formData.get("foto_rosto");
+  const asoDocumento = formData.get("aso_documento");
+  const credenciamentoDocumento = formData.get("credenciamento_documento");
 
   if (!nome || !cpf || !telefone || !asoData || !esocialMatricula || !credenciamentoData || !chavePix) {
     return { error: "Preencha todos os campos." };
   }
   if (!(fotoRosto instanceof File) || fotoRosto.size === 0) {
     return { error: "Envie uma foto do rosto." };
+  }
+  if (!(asoDocumento instanceof File) || asoDocumento.size === 0) {
+    return { error: "Envie o arquivo do ASO." };
+  }
+  if (!(credenciamentoDocumento instanceof File) || credenciamentoDocumento.size === 0) {
+    return { error: "Envie o arquivo do Credenciamento." };
   }
   if (comecaComCaractereFormula(nome)) {
     return { error: "Nome não pode começar com =, +, - ou @." };
@@ -87,6 +96,26 @@ export async function enviarDadosCadastro(
     return { error: fotoResultado.error };
   }
 
+  const asoResultado = await enviarDocumentoCadastro({
+    supabase,
+    chave: user.id,
+    tipoDocumento: "aso",
+    arquivo: asoDocumento,
+  });
+  if (asoResultado.error !== null) {
+    return { error: asoResultado.error };
+  }
+
+  const credenciamentoResultado = await enviarDocumentoCadastro({
+    supabase,
+    chave: user.id,
+    tipoDocumento: "credenciamento",
+    arquivo: credenciamentoDocumento,
+  });
+  if (credenciamentoResultado.error !== null) {
+    return { error: credenciamentoResultado.error };
+  }
+
   const { data: atualizado, error: updateError } = await supabase
     .from("solicitacoes_cadastro")
     .update({
@@ -99,6 +128,8 @@ export async function enviarDadosCadastro(
       credenciamento_data: credenciamentoData,
       chave_pix: chavePix,
       foto_rosto_path: fotoResultado.path,
+      aso_documento_path: asoResultado.path,
+      credenciamento_documento_path: credenciamentoResultado.path,
       status: "pendente",
       dados_enviados_em: new Date().toISOString(),
     })

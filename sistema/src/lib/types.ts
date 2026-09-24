@@ -22,6 +22,8 @@ export interface Bombeiro {
   credenciamento_data: string | null; // ISO date
   chave_pix: string | null;
   foto_rosto_path: string | null;
+  aso_documento_path: string | null;
+  credenciamento_documento_path: string | null;
   created_at: string;
 }
 

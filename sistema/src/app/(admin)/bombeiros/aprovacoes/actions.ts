@@ -113,6 +113,8 @@ export async function aprovarSolicitacao(formData: FormData): Promise<void> {
       credenciamento_data: solicitacao.credenciamento_data,
       chave_pix: solicitacao.chave_pix,
       foto_rosto_path: solicitacao.foto_rosto_path,
+      aso_documento_path: solicitacao.aso_documento_path,
+      credenciamento_documento_path: solicitacao.credenciamento_documento_path,
     })
     .select("id")
     .single();

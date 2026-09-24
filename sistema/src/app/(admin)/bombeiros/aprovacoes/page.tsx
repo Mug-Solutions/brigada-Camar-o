@@ -31,6 +31,8 @@ type SolicitacaoPendente = {
   credenciamento_data: string | null;
   chave_pix: string | null;
   foto_rosto_path: string | null;
+  aso_documento_path: string | null;
+  credenciamento_documento_path: string | null;
 };
 type SolicitacaoDocumentoPendente = {
   id: string;
@@ -76,7 +78,7 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
       supabase
         .from("solicitacoes_cadastro")
         .select(
-          "id, nome, cpf, telefone, funcao, email, dados_enviados_em, aso_data, esocial_matricula, credenciamento_data, chave_pix, foto_rosto_path"
+          "id, nome, cpf, telefone, funcao, email, dados_enviados_em, aso_data, esocial_matricula, credenciamento_data, chave_pix, foto_rosto_path, aso_documento_path, credenciamento_documento_path"
         )
         .eq("status", "pendente")
         .order("dados_enviados_em", { ascending: true })
@@ -243,11 +245,37 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
                       <td>{s.funcao}</td>
                       <td>{s.email}</td>
                       <td>
-                        <Chip level={aso.level} label={`${fmtDateBR(s.aso_data)} · ${aso.label}`} />
+                        <div className="flex items-center gap-1.5">
+                          <Chip level={aso.level} label={`${fmtDateBR(s.aso_data)} · ${aso.label}`} />
+                          {s.aso_documento_path && (
+                            <a
+                              href={`/api/documento-solicitacao/${s.id}?tipo=aso`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[12px]"
+                              style={{ color: "var(--accent)" }}
+                            >
+                              Ver
+                            </a>
+                          )}
+                        </div>
                       </td>
                       <td>{s.esocial_matricula ?? "—"}</td>
                       <td>
-                        <Chip level={cred.level} label={`${fmtDateBR(s.credenciamento_data)} · ${cred.label}`} />
+                        <div className="flex items-center gap-1.5">
+                          <Chip level={cred.level} label={`${fmtDateBR(s.credenciamento_data)} · ${cred.label}`} />
+                          {s.credenciamento_documento_path && (
+                            <a
+                              href={`/api/documento-solicitacao/${s.id}?tipo=credenciamento`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[12px]"
+                              style={{ color: "var(--accent)" }}
+                            >
+                              Ver
+                            </a>
+                          )}
+                        </div>
                       </td>
                       <td>{s.chave_pix ?? "—"}</td>
                       <td>{fmtDateBR(s.dados_enviados_em?.slice(0, 10) ?? null)}</td>
