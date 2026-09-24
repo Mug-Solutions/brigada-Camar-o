@@ -73,9 +73,14 @@ export default async function FolhaPagamentoPage({ params, searchParams }: PageP
             )}
           </p>
         </div>
-        <a href={`/api/export/folha-pagamento/${id}`} className="btn">
-          Exportar CSV
-        </a>
+        <div className="flex gap-2">
+          <Link href={`/financeiro/${id}/pix`} className="btn btn--primary">
+            Pagar via PIX
+          </Link>
+          <a href={`/api/export/folha-pagamento/${id}`} className="btn">
+            Exportar CSV
+          </a>
+        </div>
       </div>
 
       {mensagemErro && (

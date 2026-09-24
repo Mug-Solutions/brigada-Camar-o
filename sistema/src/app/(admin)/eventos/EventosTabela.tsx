@@ -135,6 +135,11 @@ export function EventosTabela({ eventos, escalas, precoAlimentacao }: EventosTab
                         <ExcluirEventoButton eventoId={e.id} nomeEvento={e.nome} />
                       </>
                     )}
+                    {e.status === "Concluído" && (
+                      <Link href={`/financeiro/${e.id}/pix`} className="btn btn--primary">
+                        PIX
+                      </Link>
+                    )}
                   </div>
                 </td>
               </tr>

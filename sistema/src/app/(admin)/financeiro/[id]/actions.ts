@@ -81,6 +81,7 @@ export async function marcarEscalaPaga(formData: FormData): Promise<void> {
   }
 
   revalidatePath(`/financeiro/${eventoId}`);
+  revalidatePath(`/financeiro/${eventoId}/pix`);
   revalidatePath("/financeiro");
   revalidatePath("/painel");
 }
