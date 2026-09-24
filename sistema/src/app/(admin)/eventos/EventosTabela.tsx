@@ -5,7 +5,8 @@ import Link from "next/link";
 import { fmtDateBR, fmtMoney } from "@/lib/domain";
 import { Chip } from "@/components/Chip";
 import type { Evento } from "@/lib/types";
-import { aprovarOrcamentoEvento, atualizarCustoEvento, concluirEvento } from "./actions";
+import { aprovarOrcamentoEvento, atualizarCustoEvento, cancelarEvento, concluirEvento } from "./actions";
+import { ExcluirEventoButton } from "./[id]/ExcluirEventoButton";
 import type { EscalaComBombeiro } from "./page";
 
 type EventoComCliente = Evento & { clientes: { nome: string } | null };
@@ -100,20 +101,39 @@ export function EventosTabela({ eventos, escalas, precoAlimentacao }: EventosTab
                 <td>
                   <div className="flex justify-end gap-2">
                     {e.status === "Planejamento" && (
-                      <form action={aprovarOrcamentoEvento}>
-                        <input type="hidden" name="evento_id" value={e.id} />
-                        <button type="submit" className="btn btn--primary">
-                          Aprovar orçamento
-                        </button>
-                      </form>
+                      <>
+                        <form action={aprovarOrcamentoEvento}>
+                          <input type="hidden" name="evento_id" value={e.id} />
+                          <button type="submit" className="btn btn--primary">
+                            Aprovar orçamento
+                          </button>
+                        </form>
+                        <ExcluirEventoButton eventoId={e.id} nomeEvento={e.nome} />
+                      </>
                     )}
                     {e.status === "Confirmado" && (
-                      <form action={concluirEvento}>
-                        <input type="hidden" name="evento_id" value={e.id} />
-                        <button type="submit" className="btn">
-                          Marcar concluído
-                        </button>
-                      </form>
+                      <>
+                        <form action={concluirEvento}>
+                          <input type="hidden" name="evento_id" value={e.id} />
+                          <button type="submit" className="btn">
+                            Marcar concluído
+                          </button>
+                        </form>
+                        <form
+                          action={cancelarEvento}
+                          onSubmit={(ev) => {
+                            if (!confirm(`Cancelar "${e.nome}"? Libera os bombeiros já escalados que ainda não trabalharam nesse evento.`)) {
+                              ev.preventDefault();
+                            }
+                          }}
+                        >
+                          <input type="hidden" name="evento_id" value={e.id} />
+                          <button type="submit" className="btn" style={{ borderColor: "var(--crit)", color: "var(--crit)" }}>
+                            Cancelar
+                          </button>
+                        </form>
+                        <ExcluirEventoButton eventoId={e.id} nomeEvento={e.nome} />
+                      </>
                     )}
                   </div>
                 </td>

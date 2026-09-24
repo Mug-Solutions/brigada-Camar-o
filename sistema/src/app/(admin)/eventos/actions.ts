@@ -115,6 +115,92 @@ export async function concluirEvento(formData: FormData): Promise<void> {
   await transicionarStatus(eventoId, "Confirmado", "Concluído");
 }
 
+/**
+ * Decisão do cliente: evento em Planejamento é excluído (nunca chegou
+ * a virar compromisso de verdade); evento já Confirmado pode ser
+ * cancelado (fica registrado como "não vai mais acontecer") ou
+ * excluído. Cancelar não apaga a linha de eventos — só muda o status
+ * e libera os bombeiros que ainda não trabalharam.
+ */
+export async function cancelarEvento(formData: FormData): Promise<void> {
+  const acesso = await requireStaff();
+  if (!acesso.ok) redirect("/login");
+
+  const eventoId = String(formData.get("evento_id") ?? "").trim();
+  if (!eventoId) redirect("/eventos?erro=1");
+
+  const supabase = createServerSupabaseClient();
+
+  // Mesmo limite de excluirEvento/editarEvento (eventos/[id]/actions.ts):
+  // não cancela por cima de pagamento/recebimento já fechado.
+  const { data: financeiroFechado } = await supabase
+    .from("eventos_financeiro")
+    .select("pago_bombeiros_status, recebido_cliente_status")
+    .eq("evento_id", eventoId)
+    .maybeSingle();
+  if (
+    financeiroFechado &&
+    (financeiroFechado.pago_bombeiros_status === "Pago" || financeiroFechado.recebido_cliente_status === "Recebido")
+  ) {
+    redirect("/eventos?erro=financeiro-fechado");
+  }
+
+  // Escopado a status='Confirmado' — Planejamento é excluído (não
+  // cancelado), Concluído/Cancelado não voltam atrás.
+  const { data, error } = await supabase
+    .from("eventos")
+    .update({ status: "Cancelado" })
+    .eq("id", eventoId)
+    .eq("status", "Confirmado")
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) redirect("/eventos?erro=1");
+
+  // Libera os bombeiros que ainda não trabalharam nesse evento — mesma
+  // lógica de removerEscala (achado real corrigido antes nesta mesma
+  // área do sistema): sem isso, o evento cancelado continuaria
+  // "ocupando" a candidatura, travando o bombeiro de se candidatar em
+  // outro evento. Preserva escalas com horario_cumprido preenchido —
+  // é prova de trabalho de verdade, não pode sumir só porque o evento
+  // foi cancelado depois (ver também a policy de RLS ajustada na
+  // migração 0026, pro bombeiro continuar vendo esse histórico).
+  const { error: escalasError } = await supabase
+    .from("escalas")
+    .delete()
+    .eq("evento_id", eventoId)
+    .is("horario_cumprido", null);
+  if (escalasError) {
+    console.error("[cancelarEvento] falha ao remover escalas sem trabalho registrado", {
+      eventoId,
+      erro: escalasError,
+    });
+  }
+
+  const { error: candidaturasError } = await supabase.from("candidaturas").delete().eq("evento_id", eventoId);
+  if (candidaturasError) {
+    console.error("[cancelarEvento] falha ao remover candidaturas do evento cancelado", {
+      eventoId,
+      erro: candidaturasError,
+    });
+  }
+
+  await registrarAuditoria({
+    supabase,
+    usuarioId: await usuarioIdDaSessao(),
+    tabela: "eventos",
+    registroId: eventoId,
+    acao: "cancelar",
+    valorAntes: { status: "Confirmado" },
+    valorDepois: { status: "Cancelado" },
+  });
+
+  revalidatePath("/eventos");
+  revalidatePath(`/eventos/${eventoId}`);
+  revalidatePath("/portal/escala");
+  revalidarTelasFinanceiras();
+}
+
 /** Custo do evento é um valor que o staff ajusta manualmente — a tela
  * pré-preenche o campo com a soma calculada das escalas (o que é pago
  * aos bombeiros), mas materiais tem custo variável não rastreado

@@ -32,7 +32,7 @@ export const ALIMENTACAO_DIA = 20;
 export const DIAS_SEMANA = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"] as const;
 export type DiaSemana = (typeof DIAS_SEMANA)[number];
 
-export const STATUS_EVENTO = ["Planejamento", "Confirmado", "Concluído"] as const;
+export const STATUS_EVENTO = ["Planejamento", "Confirmado", "Concluído", "Cancelado"] as const;
 export type StatusEvento = (typeof STATUS_EVENTO)[number];
 
 export const PAPEIS = ["bombeiro", "staff"] as const;

@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export type AcaoAuditoria = "criar" | "editar" | "excluir" | "aprovar" | "recusar" | "gerar";
+export type AcaoAuditoria = "criar" | "editar" | "excluir" | "aprovar" | "recusar" | "gerar" | "cancelar";
 
 interface RegistrarAuditoriaParams {
   supabase: SupabaseClient;
