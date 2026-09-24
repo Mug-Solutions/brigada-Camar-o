@@ -13,18 +13,30 @@ interface ProgramacaoEventoProps {
   dataInicio: string;
   dataFim: string;
   linhas: LinhaProgramacao[];
+  quantitativoBombeiros: number;
 }
 
 /**
  * Dias, horários e quantidade de brigadistas combinados com o cliente
  * — é exatamente a tabela que sai no orçamento e no contrato.
  */
-export function ProgramacaoEvento({ eventoId, dataInicio, dataFim, linhas }: ProgramacaoEventoProps) {
+export function ProgramacaoEvento({
+  eventoId,
+  dataInicio,
+  dataFim,
+  linhas,
+  quantitativoBombeiros,
+}: ProgramacaoEventoProps) {
   const [state, formAction, pending] = useActionState(adicionarProgramacao, initialState);
   // Controlada: o React 19 limpa o formulário depois de cada envio, e
   // a data deve ficar (o normal é cadastrar vários horários do mesmo
-  // dia). Horários e quantidade podem ser limpos mesmo.
+  // dia). Horário pode ser limpo mesmo. Qtd. Bomb. volta a ser
+  // pré-preenchida com o quantitativo definido na criação do evento —
+  // pedido do cliente pra não precisar redigitar o mesmo número toda
+  // vez, mas continua editável por linha (dia/turno pode precisar de
+  // uma quantidade diferente do resto do evento).
   const [data, setData] = useState(dataInicio);
+  const [quantidade, setQuantidade] = useState(String(quantitativoBombeiros));
 
   return (
     <div>
@@ -39,7 +51,7 @@ export function ProgramacaoEvento({ eventoId, dataInicio, dataFim, linhas }: Pro
                 <th>Data</th>
                 <th>Horário</th>
                 <th>Carga horária</th>
-                <th>Quantidade</th>
+                <th>Qtd. Bomb.</th>
                 <th></th>
               </tr>
             </thead>
@@ -91,8 +103,18 @@ export function ProgramacaoEvento({ eventoId, dataInicio, dataFim, linhas }: Pro
               <input id="prog-fim" type="time" name="hora_fim" required />
             </div>
             <div className="field">
-              <label htmlFor="prog-qtd">Qtd.</label>
-              <input id="prog-qtd" type="number" name="quantidade" min={1} max={999} step={1} required />
+              <label htmlFor="prog-qtd">Qtd. Bomb.</label>
+              <input
+                id="prog-qtd"
+                type="number"
+                name="quantidade"
+                min={1}
+                max={999}
+                step={1}
+                value={quantidade}
+                onChange={(e) => setQuantidade(e.target.value)}
+                required
+              />
             </div>
             <button type="submit" className="btn btn--primary justify-center" disabled={pending}>
               {pending ? "Salvando..." : "Adicionar"}

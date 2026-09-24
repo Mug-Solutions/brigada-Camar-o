@@ -167,6 +167,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
                 dataInicio={eventoTyped.data_inicio}
                 dataFim={eventoTyped.data_fim}
                 linhas={documento.programacao}
+                quantitativoBombeiros={eventoTyped.quantitativo_bombeiros}
               />
             </div>
           )}
