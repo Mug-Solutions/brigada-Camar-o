@@ -33,15 +33,18 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
 
   let disponibilidades: Disponibilidade[] = [];
   let bombeiro: { telefone: string | null; chave_pix: string | null } | null = null;
+  let turnos: string[] = [];
   if (sessao.usuario?.bombeiro_id) {
     const supabase = await getSessionSupabaseClient();
     if (supabase) {
-      const [{ data: disponibilidadesData }, { data: bombeiroData }] = await Promise.all([
+      const [{ data: disponibilidadesData }, { data: bombeiroData }, { data: turnosData }] = await Promise.all([
         supabase.from("disponibilidades").select("*").order("dia_semana", { ascending: true }),
         supabase.from("bombeiros").select("telefone, chave_pix").eq("id", sessao.usuario.bombeiro_id).maybeSingle(),
+        supabase.from("turnos_config").select("nome").eq("ativo", true).order("nome", { ascending: true }),
       ]);
       disponibilidades = (disponibilidadesData ?? []) as Disponibilidade[];
       bombeiro = bombeiroData ?? null;
+      turnos = ((turnosData ?? []) as { nome: string }[]).map((t) => t.nome);
     }
   }
 
@@ -106,7 +109,7 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
           </ul>
         )}
 
-        <AdicionarDisponibilidadeForm />
+        <AdicionarDisponibilidadeForm turnos={turnos} />
       </div>
     </div>
   );

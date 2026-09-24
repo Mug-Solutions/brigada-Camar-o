@@ -6,23 +6,21 @@ export const FUNCOES = [
 
 export type Funcao = (typeof FUNCOES)[number];
 
-// `valor` aqui é só o default do modo de demonstração (sem Supabase
-// configurado) e a chave de nome/horário de cada turno — o preço real
-// vem de `precos_config` (tabela, editável em /precos), não daqui.
-// Ver CHAVE_PRECO_POR_TURNO para o mapeamento turno → chave na tabela.
+// Só o default do modo de demonstração (sem Supabase configurado) —
+// turnos de verdade são configuráveis pelo staff em /precos/turnos
+// (tabela turnos_config, migração 0028: nome, horário e valor editáveis,
+// staff pode criar/desativar/excluir). Turno deixou de ser uma union
+// fixa por isso — mesmo raciocínio já aplicado a Funcao/FUNCOES depois
+// da migração 0021 (funcoes_bombeiro): a lista real mora no banco, o
+// tipo TypeScript só precisa ser largo o bastante pra aceitar qualquer
+// valor validado em runtime contra a tabela.
 export const TURNOS = {
   Diurno: { ini: "08:00", fim: "18:00", valor: 150 },
   Noturno: { ini: "18:00", fim: "00:00", valor: 135 },
   Especial: { ini: "08:00", fim: "20:00", valor: 280 },
 } as const;
 
-export type Turno = keyof typeof TURNOS;
-
-export const CHAVE_PRECO_POR_TURNO: Record<Turno, string> = {
-  Diurno: "turno_diurno",
-  Noturno: "turno_noturno",
-  Especial: "turno_especial",
-};
+export type Turno = string;
 
 export const CHAVE_PRECO_ALIMENTACAO = "alimentacao_dia";
 

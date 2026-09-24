@@ -7,7 +7,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { comecaComCaractereFormula } from "@/lib/validation/csv-seguro";
 import { telefoneTemFormatoValido } from "@/lib/validation/documento";
 import { registrarAuditoria } from "@/lib/auditoria";
-import { DIAS_SEMANA, TURNOS, type DiaSemana, type Turno } from "@/lib/constants";
+import { DIAS_SEMANA, type DiaSemana } from "@/lib/constants";
 
 const MAXIMO_DISPONIBILIDADES = 50;
 const TAMANHO_MAXIMO_REGIAO = 80;
@@ -32,11 +32,22 @@ export async function adicionarDisponibilidade(formData: FormData): Promise<void
   const regiao = String(formData.get("regiao") ?? "").trim();
 
   if (!DIAS_SEMANA.includes(diaSemana as DiaSemana)) redirect("/portal/meus-dados?erro=1");
-  if (!Object.keys(TURNOS).includes(turno)) redirect("/portal/meus-dados?erro=1");
+  if (!turno) redirect("/portal/meus-dados?erro=1");
   if (regiao.length > TAMANHO_MAXIMO_REGIAO) redirect("/portal/meus-dados?erro=1");
   if (regiao && comecaComCaractereFormula(regiao)) redirect("/portal/meus-dados?erro=1");
 
   const supabase = createServerSupabaseClient();
+
+  // Re-checagem no servidor contra a tabela configurável
+  // (turnos_config, migração 0028) — mesmo raciocínio de `funcao`:
+  // não confia só no <select> do formulário.
+  const { data: turnoValido } = await supabase
+    .from("turnos_config")
+    .select("nome")
+    .eq("nome", turno)
+    .eq("ativo", true)
+    .maybeSingle();
+  if (!turnoValido) redirect("/portal/meus-dados?erro=1");
 
   // Teto de linhas por bombeiro — achado de revisão de segurança: sem
   // isso, chamar esta action repetidamente (mesmo com valores
@@ -53,7 +64,7 @@ export async function adicionarDisponibilidade(formData: FormData): Promise<void
   const { error } = await supabase.from("disponibilidades").insert({
     bombeiro_id: bombeiroId,
     dia_semana: diaSemana,
-    turno: turno as Turno,
+    turno,
     regiao: regiao || null,
   });
 

@@ -25,10 +25,10 @@ export const MOCK_CLIENTES: Cliente[] = [
   { id: "c3", nome: "Betim Sports Arena", cnpj: "34.567.890/0001-12", contato: "(31) 3466-3300", email: "arena@betimsports.com.br", endereco: "Av. dos Esportes, 1200 — Betim/MG", created_at: "2026-01-01" },
 ];
 
+// Preço de turno mora em turnos_config (migração 0028), não mais aqui
+// — precos_config no modo demonstração só tem os "tipos de gasto" que
+// não são turno.
 export const MOCK_PRECOS: PrecoConfig[] = [
-  { chave: "turno_diurno", valor: 150, descricao: "Diária — Turno Diurno (08:00–18:00)", updated_at: "2026-01-01" },
-  { chave: "turno_noturno", valor: 135, descricao: "Diária — Turno Noturno (18:00–00:00)", updated_at: "2026-01-01" },
-  { chave: "turno_especial", valor: 280, descricao: "Diária — Turno Especial (08:00–20:00)", updated_at: "2026-01-01" },
   { chave: "alimentacao_dia", valor: 20, descricao: "Alimentação por dia", updated_at: "2026-01-01" },
 ];
 

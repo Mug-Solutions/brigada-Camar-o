@@ -1,9 +1,13 @@
 "use client";
 
-import { DIAS_SEMANA, TURNOS } from "@/lib/constants";
+import { DIAS_SEMANA } from "@/lib/constants";
 import { adicionarDisponibilidade } from "./actions";
 
-export function AdicionarDisponibilidadeForm() {
+interface AdicionarDisponibilidadeFormProps {
+  turnos: string[];
+}
+
+export function AdicionarDisponibilidadeForm({ turnos }: AdicionarDisponibilidadeFormProps) {
   return (
     <form action={adicionarDisponibilidade} className="flex flex-wrap items-end gap-2">
       <div className="field">
@@ -18,8 +22,8 @@ export function AdicionarDisponibilidadeForm() {
       </div>
       <div className="field">
         <label htmlFor="turno">Turno</label>
-        <select id="turno" name="turno" defaultValue={Object.keys(TURNOS)[0]}>
-          {Object.keys(TURNOS).map((turno) => (
+        <select id="turno" name="turno" defaultValue={turnos[0]}>
+          {turnos.map((turno) => (
             <option key={turno} value={turno}>
               {turno}
             </option>

@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { getServerSupabaseClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/lib/auth/session";
 import { bombeiroAptidao, fmtDateBR, fmtMoney } from "@/lib/domain";
-import { TURNOS } from "@/lib/constants";
 import type { Bombeiro, Candidatura, Escala, Evento } from "@/lib/types";
 import { AdicionarEscalaForm } from "./AdicionarEscalaForm";
 import { EscalaTabela } from "./EscalaTabela";
@@ -56,6 +55,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
     { data: bombeirosData },
     { data: candidaturasData },
     { data: disponibilidadesData },
+    { data: turnosData },
     documento,
   ] = await Promise.all([
     supabase.from("eventos").select("*, clientes(nome)").eq("id", id).maybeSingle(),
@@ -80,6 +80,11 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
     // formulário em vez de fazer um segundo round-trip dependente dos
     // bombeiros aptos.
     supabase.from("disponibilidades").select("bombeiro_id, dia_semana, turno, regiao"),
+    supabase
+      .from("turnos_config")
+      .select("nome, hora_inicio, hora_fim, valor")
+      .eq("ativo", true)
+      .order("nome", { ascending: true }),
     carregarDadosDocumento(supabase, id),
   ]);
 
@@ -94,6 +99,9 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
     turno: string;
     regiao: string | null;
   }[];
+  const turnos = ((turnosData ?? []) as { nome: string; hora_inicio: string; hora_fim: string; valor: number }[]).map(
+    (t) => ({ nome: t.nome, ini: t.hora_inicio.slice(0, 5), fim: t.hora_fim.slice(0, 5), valor: Number(t.valor) })
+  );
   const bombeirosAptos = bombeiros.filter((b) => bombeiroAptidao(b).level !== "crit");
   const bombeirosAptosPorId = new Map(bombeirosAptos.map((b) => [b.id, b]));
   const eventoTyped = evento as Evento & { clientes: { nome: string } | null };
@@ -291,7 +299,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
               dataInicio={eventoTyped.data_inicio}
               dataFim={eventoTyped.data_fim}
               bombeiros={bombeirosAptos.map((b) => ({ id: b.id, nome: b.nome }))}
-              turnos={Object.entries(TURNOS).map(([nome, t]) => ({ nome, ...t }))}
+              turnos={turnos}
               disponibilidades={disponibilidades}
               bombeiroSelecionadoId={bombeiroParaEscalar?.id}
             />

@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getSessionUsuario, requireStaff } from "@/lib/auth/session";
 import { bombeiroAptidao } from "@/lib/domain";
-import { CHAVE_PRECO_POR_TURNO, TURNOS, type Turno } from "@/lib/constants";
 import type { Bombeiro } from "@/lib/types";
 import { validarDadosEvento } from "../validacao";
 import { registrarAuditoria } from "@/lib/auditoria";
@@ -14,10 +13,6 @@ import { validarLinhaProgramacao } from "@/lib/documentos-cliente/dados";
 
 export type EscalaFormState = { error: string | null };
 export type EditarEventoState = { error: string | null };
-
-function ehTurnoValido(turno: string): turno is Turno {
-  return Object.keys(TURNOS).includes(turno);
-}
 
 /**
  * Montagem manual de escala. Bloqueio automático de bombeiro com
@@ -39,7 +34,7 @@ export async function adicionarEscala(
   const turno = String(formData.get("turno") ?? "").trim();
   const tipo = String(formData.get("tipo") ?? "titular").trim();
 
-  if (!eventoId || !bombeiroId || !data || !ehTurnoValido(turno)) {
+  if (!eventoId || !bombeiroId || !data || !turno) {
     return { error: "Preencha bombeiro, data e turno." };
   }
   if (tipo !== "titular" && tipo !== "reserva") {
@@ -72,17 +67,19 @@ export async function adicionarEscala(
     return { error: "Este bombeiro está com documentação vencida e não pode ser escalado." };
   }
 
-  // Preço vem da régua configurável (precos_config), não mais do
-  // valor fixo em src/lib/constants.ts — fallback pro valor fixo só
-  // se a linha de configuração ainda não existir (ex.: banco sem a
-  // migração 0008 aplicada), pra não travar a escalação por causa
-  // disso.
-  const { data: preco } = await supabase
-    .from("precos_config")
+  // Re-checagem no servidor contra a tabela configurável
+  // (turnos_config, migração 0028) — mesma disciplina de `funcao`:
+  // não confia só no <select> do formulário. Essa consulta já valida
+  // E precifica numa tacada só (preço mora em turnos_config.valor,
+  // não mais numa chave separada em precos_config).
+  const { data: turnoConfig } = await supabase
+    .from("turnos_config")
     .select("valor")
-    .eq("chave", CHAVE_PRECO_POR_TURNO[turno])
+    .eq("nome", turno)
+    .eq("ativo", true)
     .maybeSingle();
-  const valorTurno = preco ? Number(preco.valor) : TURNOS[turno].valor;
+  if (!turnoConfig) return { error: "Turno inválido." };
+  const valorTurno = Number(turnoConfig.valor);
 
   const { error } = await supabase.from("escalas").insert({
     evento_id: eventoId,
