@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useState } from "react";
 import { TAMANHO_MAXIMO_DOCUMENTO_BYTES } from "@/lib/constants";
+import { comprimirImagemSeNecessario } from "@/lib/imagem-cliente";
 import { enviarDocumento, type EnviarDocumentoState } from "./actions";
 
 const initialState: EnviarDocumentoState = { error: null, sucesso: false };
@@ -15,6 +16,7 @@ interface EnviarDocumentoFormProps {
 export function EnviarDocumentoForm({ tipoDocumento, label }: EnviarDocumentoFormProps) {
   const [state, formAction, pending] = useActionState(enviarDocumento, initialState);
   const [erroTamanho, setErroTamanho] = useState<string | null>(null);
+  const [comprimindo, setComprimindo] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
@@ -25,14 +27,40 @@ export function EnviarDocumentoForm({ tipoDocumento, label }: EnviarDocumentoFor
         // o Next.js rejeita com um 413 genérico antes da Server Action
         // rodar — a página trava numa tela de erro de rede em vez da
         // mensagem amigável (achado real: fotos de celular em
-        // resolução máxima passam fácil dos 5MB aceitos aqui). Barra
-        // no cliente antes de sequer tentar mandar pro servidor.
+        // resolução máxima passam fácil dos 5MB aceitos aqui). Um PDF
+        // grande não dá pra comprimir no navegador sem lib pesada, mas
+        // uma foto (o caso comum) é redimensionada/recomprimida aqui
+        // mesmo — o bombeiro não devia ter que saber o que é
+        // "resolução" pra conseguir mandar o documento.
         const arquivo = formData.get("arquivo");
-        if (arquivo instanceof File && arquivo.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
-          setErroTamanho(`Arquivo maior que ${TAMANHO_MAXIMO_MB}MB — comprima ou tire uma foto com menos resolução.`);
-          return;
+        if (!(arquivo instanceof File)) return;
+
+        let arquivoFinal = arquivo;
+        if (arquivo.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
+          if (arquivo.type === "application/pdf") {
+            setErroTamanho(`PDF maior que ${TAMANHO_MAXIMO_MB}MB — comprima o arquivo antes de enviar.`);
+            return;
+          }
+          setComprimindo(true);
+          try {
+            arquivoFinal = await comprimirImagemSeNecessario(arquivo, TAMANHO_MAXIMO_DOCUMENTO_BYTES);
+          } catch {
+            // Formato que o navegador não conseguiu decodificar como
+            // imagem (raro) — mantém o original e deixa a checagem de
+            // tamanho abaixo mostrar o erro amigável de sempre.
+          } finally {
+            setComprimindo(false);
+          }
+          if (arquivoFinal.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
+            setErroTamanho(
+              `Não foi possível reduzir a imagem abaixo de ${TAMANHO_MAXIMO_MB}MB — tire a foto com menos zoom ou resolução.`
+            );
+            return;
+          }
         }
+
         setErroTamanho(null);
+        formData.set("arquivo", arquivoFinal);
         await formAction(formData);
         formRef.current?.reset();
       }}
@@ -50,8 +78,8 @@ export function EnviarDocumentoForm({ tipoDocumento, label }: EnviarDocumentoFor
             onChange={() => setErroTamanho(null)}
           />
         </div>
-        <button type="submit" className="btn" disabled={pending}>
-          {pending ? "Enviando..." : "Enviar"}
+        <button type="submit" className="btn" disabled={pending || comprimindo}>
+          {comprimindo ? "Compactando..." : pending ? "Enviando..." : "Enviar"}
         </button>
       </div>
       {(erroTamanho ?? state.error) && (
