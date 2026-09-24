@@ -3,6 +3,7 @@ import { getSessionUsuario } from "@/lib/auth/session";
 import { getSessionSupabaseClient } from "@/lib/supabase/server-auth";
 import type { Disponibilidade } from "@/lib/types";
 import { AdicionarDisponibilidadeForm } from "./AdicionarDisponibilidadeForm";
+import { MeusDadosForm } from "./MeusDadosForm";
 import { removerDisponibilidade } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -31,14 +32,16 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
   if (!sessao.loggedIn) redirect("/login");
 
   let disponibilidades: Disponibilidade[] = [];
+  let bombeiro: { telefone: string | null; chave_pix: string | null } | null = null;
   if (sessao.usuario?.bombeiro_id) {
     const supabase = await getSessionSupabaseClient();
     if (supabase) {
-      const { data } = await supabase
-        .from("disponibilidades")
-        .select("*")
-        .order("dia_semana", { ascending: true });
-      disponibilidades = (data ?? []) as Disponibilidade[];
+      const [{ data: disponibilidadesData }, { data: bombeiroData }] = await Promise.all([
+        supabase.from("disponibilidades").select("*").order("dia_semana", { ascending: true }),
+        supabase.from("bombeiros").select("telefone, chave_pix").eq("id", sessao.usuario.bombeiro_id).maybeSingle(),
+      ]);
+      disponibilidades = (disponibilidadesData ?? []) as Disponibilidade[];
+      bombeiro = bombeiroData ?? null;
     }
   }
 
@@ -48,7 +51,7 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
         Meus Dados
       </h1>
       <p className="mb-6 text-[13px]" style={{ color: "var(--text-soft)" }}>
-        Telefone, endereço e chave PIX.
+        Telefone, chave PIX e disponibilidade.
       </p>
 
       {mensagemErro && (
@@ -61,9 +64,16 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
       )}
 
       <div className="panel-block mb-4 p-5">
-        <p className="text-[13px]" style={{ color: "var(--text-soft)" }}>
-          Em construção — chega numa próxima etapa.
+        <h2
+          className="mb-1 text-[13px] font-semibold uppercase tracking-wide"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Contato e Pagamento
+        </h2>
+        <p className="mb-4 text-[12.5px]" style={{ color: "var(--text-soft)" }}>
+          Atualiza direto, sem precisar de aprovação da coordenação.
         </p>
+        <MeusDadosForm telefone={bombeiro?.telefone ?? null} chavePix={bombeiro?.chave_pix ?? null} />
       </div>
 
       <div className="panel-block p-5">

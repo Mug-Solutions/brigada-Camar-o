@@ -5,10 +5,13 @@ import { revalidatePath } from "next/cache";
 import { getSessionUsuario } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { comecaComCaractereFormula } from "@/lib/validation/csv-seguro";
+import { telefoneTemFormatoValido } from "@/lib/validation/documento";
+import { registrarAuditoria } from "@/lib/auditoria";
 import { DIAS_SEMANA, TURNOS, type DiaSemana, type Turno } from "@/lib/constants";
 
 const MAXIMO_DISPONIBILIDADES = 50;
 const TAMANHO_MAXIMO_REGIAO = 80;
+const TAMANHO_MAXIMO_CHAVE_PIX = 140;
 
 async function bombeiroIdDaSessaoOuRedireciona(): Promise<string> {
   const sessao = await getSessionUsuario();
@@ -61,6 +64,68 @@ export async function adicionarDisponibilidade(formData: FormData): Promise<void
   }
 
   revalidatePath("/portal/meus-dados");
+}
+
+export type AtualizarMeusDadosState = { error: string | null; sucesso: boolean };
+
+/**
+ * Decisão do cliente: telefone e chave PIX o próprio bombeiro atualiza
+ * direto, sem passar por aprovação da coordenação — diferente da data
+ * de validade de ASO/Credenciamento (solicitarAtualizacaoDocumento),
+ * que afeta o bloqueio automático de escalação e por isso precisa de
+ * revisão. bombeiro_id vem sempre da sessão, nunca de um campo de
+ * formulário.
+ */
+export async function atualizarMeusDados(
+  _prevState: AtualizarMeusDadosState,
+  formData: FormData
+): Promise<AtualizarMeusDadosState> {
+  const sessao = await getSessionUsuario();
+  if (!sessao.configured || !sessao.loggedIn) {
+    return { error: "Sessão expirada. Faça login novamente.", sucesso: false };
+  }
+  const bombeiroId = sessao.usuario?.bombeiro_id;
+  if (!bombeiroId) {
+    return { error: "Conta não vinculada a um cadastro de bombeiro.", sucesso: false };
+  }
+
+  const telefone = String(formData.get("telefone") ?? "").trim();
+  const chavePix = String(formData.get("chave_pix") ?? "").trim();
+
+  if (!telefone || !chavePix) {
+    return { error: "Preencha todos os campos.", sucesso: false };
+  }
+  if (!telefoneTemFormatoValido(telefone)) {
+    return { error: "Telefone inválido.", sucesso: false };
+  }
+  if (chavePix.length > TAMANHO_MAXIMO_CHAVE_PIX) {
+    return { error: "Chave PIX inválida.", sucesso: false };
+  }
+  if (comecaComCaractereFormula(chavePix)) {
+    return { error: "Chave PIX não pode começar com =, +, - ou @.", sucesso: false };
+  }
+
+  const supabase = createServerSupabaseClient();
+  const { error } = await supabase
+    .from("bombeiros")
+    .update({ telefone, chave_pix: chavePix })
+    .eq("id", bombeiroId);
+
+  if (error) {
+    return { error: `Erro ao salvar: ${error.message}`, sucesso: false };
+  }
+
+  await registrarAuditoria({
+    supabase,
+    usuarioId: sessao.usuario?.id,
+    tabela: "bombeiros",
+    registroId: bombeiroId,
+    acao: "editar",
+    valorDepois: { telefone, chave_pix: chavePix },
+  });
+
+  revalidatePath("/portal/meus-dados");
+  return { error: null, sucesso: true };
 }
 
 export async function removerDisponibilidade(formData: FormData): Promise<void> {
