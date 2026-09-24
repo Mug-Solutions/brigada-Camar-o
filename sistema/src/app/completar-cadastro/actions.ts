@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { getSessionSupabaseClient } from "@/lib/supabase/server-auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cpfTemFormatoValido, telefoneTemFormatoValido } from "@/lib/validation/documento";
@@ -115,6 +116,14 @@ export async function enviarDadosCadastro(
   if (!atualizado) {
     return { error: "Não encontramos seu convite pendente. Fale com a coordenação." };
   }
+
+  // Sem isso, a fila de aprovação (que já é dynamic, mas ainda assim
+  // cacheada no lado do cliente pelo Router Cache do Next.js) só
+  // mostrava essa solicitação depois de um hard refresh — achado real:
+  // convidarBombeiro/aprovarSolicitacao/recusarSolicitacao já
+  // revalidam essa rota, só esta ação (a única que roda na sessão do
+  // BOMBEIRO, não da coordenação) não revalidava.
+  revalidatePath("/bombeiros/aprovacoes");
 
   redirect("/completar-cadastro");
 }
