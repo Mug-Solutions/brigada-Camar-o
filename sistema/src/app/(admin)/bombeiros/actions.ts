@@ -7,6 +7,7 @@ import { requireStaff, getSessionUsuario } from "@/lib/auth/session";
 import { comecaComCaractereFormula } from "@/lib/validation/csv-seguro";
 import { registrarAuditoria } from "@/lib/auditoria";
 import { ehTipoDocumentoAnexoValido, enviarDocumentoBombeiro } from "@/lib/documentos";
+import { enviarFotoRosto } from "@/lib/foto-rosto";
 
 export type EnviarDocumentoStaffState = { error: string | null };
 
@@ -30,9 +31,13 @@ export async function criarBombeiro(
   const esocialMatricula = String(formData.get("esocial_matricula") ?? "").trim();
   const credenciamentoData = String(formData.get("credenciamento_data") ?? "").trim();
   const chavePix = String(formData.get("chave_pix") ?? "").trim();
+  const fotoRosto = formData.get("foto_rosto");
 
   if (!nome || !cpf || !asoData || !esocialMatricula || !credenciamentoData) {
     return { error: "Preencha nome, CPF, ASO, matrícula E-Social e credenciamento." };
+  }
+  if (!(fotoRosto instanceof File) || fotoRosto.size === 0) {
+    return { error: "Envie uma foto do rosto do bombeiro." };
   }
   if (comecaComCaractereFormula(nome)) {
     return { error: "Nome não pode começar com =, +, - ou @." };
@@ -61,6 +66,15 @@ export async function criarBombeiro(
     return { error: "Função inválida." };
   }
 
+  // Sobe a foto ANTES de criar o bombeiro — se falhar (formato/tamanho
+  // inválido), não sobra um bombeiro sem foto pra corrigir depois.
+  // Bombeiro ainda não existe nesse momento (é criado logo abaixo),
+  // então a chave do path é um UUID novo, não o bombeiro_id.
+  const fotoResultado = await enviarFotoRosto({ supabase, chave: crypto.randomUUID(), arquivo: fotoRosto });
+  if (fotoResultado.error !== null) {
+    return { error: fotoResultado.error };
+  }
+
   const { data: bombeiro, error } = await supabase
     .from("bombeiros")
     .insert({
@@ -73,6 +87,7 @@ export async function criarBombeiro(
       esocial_status: "Ativo",
       credenciamento_data: credenciamentoData,
       chave_pix: chavePix || null,
+      foto_rosto_path: fotoResultado.path,
     })
     .select("id")
     .single();

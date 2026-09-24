@@ -82,7 +82,7 @@ export async function enviarDadosCadastro(
     return { error: "Esse CPF já está cadastrado. Fale com a coordenação." };
   }
 
-  const fotoResultado = await enviarFotoRosto({ supabase, authId: user.id, arquivo: fotoRosto });
+  const fotoResultado = await enviarFotoRosto({ supabase, chave: user.id, arquivo: fotoRosto });
   if (fotoResultado.error !== null) {
     return { error: fotoResultado.error };
   }

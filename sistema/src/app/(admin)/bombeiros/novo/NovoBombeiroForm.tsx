@@ -1,11 +1,14 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { criarBombeiro, type CriarBombeiroState } from "../actions";
 import { mascararCPF, mascararTelefone } from "@/lib/validation/mascara";
+import { TAMANHO_MAXIMO_DOCUMENTO_BYTES } from "@/lib/constants";
+import { comprimirImagemSeNecessario } from "@/lib/imagem-cliente";
 
 const initialState: CriarBombeiroState = { error: null };
+const TAMANHO_MAXIMO_MB = TAMANHO_MAXIMO_DOCUMENTO_BYTES / (1024 * 1024);
 
 interface NovoBombeiroFormProps {
   funcoes: string[];
@@ -13,15 +16,43 @@ interface NovoBombeiroFormProps {
 
 export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
   const [state, formAction, pending] = useActionState(criarBombeiro, initialState);
+  const [erroFoto, setErroFoto] = useState<string | null>(null);
+  const [comprimindo, setComprimindo] = useState(false);
 
   return (
-    <form action={formAction} className="panel-block max-w-[560px] p-6">
-      {state.error && (
+    <form
+      action={async (formData) => {
+        // Mesmo achado do autocadastro (CompletarCadastroForm.tsx): uma
+        // foto de celular em resolução máxima passa fácil do limite do
+        // body das Server Actions — comprime aqui antes de enviar.
+        const foto = formData.get("foto_rosto");
+        if (foto instanceof File && foto.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
+          setComprimindo(true);
+          try {
+            const comprimida = await comprimirImagemSeNecessario(foto, TAMANHO_MAXIMO_DOCUMENTO_BYTES);
+            if (comprimida.size > TAMANHO_MAXIMO_DOCUMENTO_BYTES) {
+              setErroFoto(`Não foi possível reduzir a foto abaixo de ${TAMANHO_MAXIMO_MB}MB — tire com menos zoom.`);
+              setComprimindo(false);
+              return;
+            }
+            formData.set("foto_rosto", comprimida);
+          } catch {
+            // Mantém a original — o erro amigável de tamanho do servidor cobre esse caso.
+          } finally {
+            setComprimindo(false);
+          }
+        }
+        setErroFoto(null);
+        await formAction(formData);
+      }}
+      className="panel-block max-w-[560px] p-6"
+    >
+      {(erroFoto ?? state.error) && (
         <div
           className="mb-5 rounded-md border px-4 py-3 text-[13px]"
           style={{ borderColor: "var(--crit)", background: "var(--crit-bg)", color: "var(--crit)" }}
         >
-          {state.error}
+          {erroFoto ?? state.error}
         </div>
       )}
 
@@ -35,6 +66,17 @@ export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
         <div className="field mb-4">
           <label htmlFor="nome">Nome completo</label>
           <input type="text" id="nome" name="nome" required />
+        </div>
+        <div className="field mb-4">
+          <label htmlFor="foto_rosto">Foto do rosto</label>
+          <input
+            type="file"
+            id="foto_rosto"
+            name="foto_rosto"
+            accept="image/jpeg,image/png"
+            required
+            onChange={() => setErroFoto(null)}
+          />
         </div>
         <div className="mb-4 grid grid-cols-2 gap-3">
           <div className="field">
@@ -121,8 +163,8 @@ export function NovoBombeiroForm({ funcoes }: NovoBombeiroFormProps) {
         <Link href="/bombeiros" className="btn">
           Cancelar
         </Link>
-        <button type="submit" className="btn btn--primary" disabled={pending}>
-          {pending ? "Salvando..." : "Salvar Bombeiro"}
+        <button type="submit" className="btn btn--primary" disabled={pending || comprimindo}>
+          {comprimindo ? "Compactando foto..." : pending ? "Salvando..." : "Salvar Bombeiro"}
         </button>
       </div>
     </form>

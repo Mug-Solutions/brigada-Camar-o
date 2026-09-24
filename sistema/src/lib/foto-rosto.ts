@@ -24,23 +24,25 @@ async function assinaturaBateComTipo(arquivo: File): Promise<boolean> {
 
 interface EnviarFotoRostoParams {
   supabase: SupabaseClient;
-  authId: string;
+  chave: string;
   arquivo: File;
 }
 
 export type EnviarFotoRostoResultado = { error: string; path?: undefined } | { error: null; path: string };
 
 /**
- * Upload da foto de rosto no autocadastro (/completar-cadastro) — path
- * fixo por auth_id (não um UUID novo a cada envio, diferente de
- * bombeiro_documentos) porque só existe UMA foto de rosto por pessoa:
- * reenviar (ex.: depois de corrigir outro campo do formulário e
- * submeter de novo) só sobrescreve a mesma foto, sem deixar arquivo
- * órfão no Storage.
+ * Upload da foto de rosto — usado tanto no autocadastro do bombeiro
+ * (/completar-cadastro, `chave` = auth_id) quanto no cadastro manual
+ * pelo staff (/bombeiros/novo, `chave` = um UUID novo, já que o
+ * bombeiro ainda não existe nesse momento). Path fixo por `chave` (não
+ * um UUID novo a cada envio, diferente de bombeiro_documentos) porque
+ * só existe UMA foto de rosto por pessoa: reenviar (ex.: depois de
+ * corrigir outro campo do formulário e submeter de novo) só
+ * sobrescreve a mesma foto, sem deixar arquivo órfão no Storage.
  */
 export async function enviarFotoRosto({
   supabase,
-  authId,
+  chave,
   arquivo,
 }: EnviarFotoRostoParams): Promise<EnviarFotoRostoResultado> {
   if (!arquivo || arquivo.size === 0) {
@@ -57,7 +59,7 @@ export async function enviarFotoRosto({
     return { error: "O conteúdo do arquivo não bate com o formato declarado — envie uma foto JPG ou PNG de verdade." };
   }
 
-  const caminho = `${authId}/rosto.${extensao}`;
+  const caminho = `${chave}/rosto.${extensao}`;
 
   const { error: uploadError } = await supabase.storage
     .from("fotos-bombeiros")
