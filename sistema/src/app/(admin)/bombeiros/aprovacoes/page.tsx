@@ -30,6 +30,7 @@ type SolicitacaoPendente = {
   esocial_matricula: string | null;
   credenciamento_data: string | null;
   chave_pix: string | null;
+  foto_rosto_path: string | null;
 };
 type SolicitacaoDocumentoPendente = {
   id: string;
@@ -74,7 +75,9 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
         .limit(LIMITE_FILA),
       supabase
         .from("solicitacoes_cadastro")
-        .select("id, nome, cpf, telefone, funcao, email, dados_enviados_em, aso_data, esocial_matricula, credenciamento_data, chave_pix")
+        .select(
+          "id, nome, cpf, telefone, funcao, email, dados_enviados_em, aso_data, esocial_matricula, credenciamento_data, chave_pix, foto_rosto_path"
+        )
         .eq("status", "pendente")
         .order("dados_enviados_em", { ascending: true })
         .limit(LIMITE_FILA),
@@ -191,6 +194,7 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
             <table className="min-w-[960px]">
               <thead>
                 <tr>
+                  <th>Foto</th>
                   <th>Nome</th>
                   <th>CPF</th>
                   <th>Telefone</th>
@@ -207,7 +211,7 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
               <tbody>
                 {pendentes.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-8 text-center" style={{ color: "var(--text-faint)" }}>
+                    <td colSpan={12} className="py-8 text-center" style={{ color: "var(--text-faint)" }}>
                       Nenhuma solicitação pendente.
                     </td>
                   </tr>
@@ -217,6 +221,22 @@ export default async function AprovacoesPage({ searchParams }: PageProps<"/bombe
                     const cred = docStatus(s.credenciamento_data);
                     return (
                     <tr key={s.id}>
+                      <td>
+                        {s.foto_rosto_path ? (
+                          <a href={`/api/foto-rosto-solicitacao/${s.id}`} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={`/api/foto-rosto-solicitacao/${s.id}`}
+                              alt={`Foto de ${s.nome}`}
+                              className="h-10 w-10 rounded-full object-cover"
+                              style={{ border: "1px solid var(--line)" }}
+                            />
+                          </a>
+                        ) : (
+                          <span className="text-[12px]" style={{ color: "var(--text-faint)" }}>
+                            —
+                          </span>
+                        )}
+                      </td>
                       <td className="font-semibold">{s.nome}</td>
                       <td style={{ fontFamily: "var(--font-mono)" }}>{s.cpf}</td>
                       <td>{s.telefone}</td>

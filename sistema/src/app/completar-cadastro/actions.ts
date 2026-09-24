@@ -5,6 +5,7 @@ import { getSessionSupabaseClient } from "@/lib/supabase/server-auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cpfTemFormatoValido, telefoneTemFormatoValido } from "@/lib/validation/documento";
 import { comecaComCaractereFormula } from "@/lib/validation/csv-seguro";
+import { enviarFotoRosto } from "@/lib/foto-rosto";
 
 export type CompletarCadastroState = { error: string | null };
 
@@ -32,9 +33,13 @@ export async function enviarDadosCadastro(
   const esocialMatricula = String(formData.get("esocial_matricula") ?? "").trim();
   const credenciamentoData = String(formData.get("credenciamento_data") ?? "").trim();
   const chavePix = String(formData.get("chave_pix") ?? "").trim();
+  const fotoRosto = formData.get("foto_rosto");
 
   if (!nome || !cpf || !telefone || !asoData || !esocialMatricula || !credenciamentoData || !chavePix) {
     return { error: "Preencha todos os campos." };
+  }
+  if (!(fotoRosto instanceof File) || fotoRosto.size === 0) {
+    return { error: "Envie uma foto do rosto." };
   }
   if (comecaComCaractereFormula(nome)) {
     return { error: "Nome não pode começar com =, +, - ou @." };
@@ -76,6 +81,11 @@ export async function enviarDadosCadastro(
     return { error: "Esse CPF já está cadastrado. Fale com a coordenação." };
   }
 
+  const fotoResultado = await enviarFotoRosto({ supabase, authId: user.id, arquivo: fotoRosto });
+  if (fotoResultado.error !== null) {
+    return { error: fotoResultado.error };
+  }
+
   const { data: atualizado, error: updateError } = await supabase
     .from("solicitacoes_cadastro")
     .update({
@@ -87,6 +97,7 @@ export async function enviarDadosCadastro(
       esocial_matricula: esocialMatricula,
       credenciamento_data: credenciamentoData,
       chave_pix: chavePix,
+      foto_rosto_path: fotoResultado.path,
       status: "pendente",
       dados_enviados_em: new Date().toISOString(),
     })

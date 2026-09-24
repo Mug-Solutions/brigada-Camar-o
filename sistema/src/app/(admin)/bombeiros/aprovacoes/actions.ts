@@ -112,6 +112,7 @@ export async function aprovarSolicitacao(formData: FormData): Promise<void> {
       esocial_matricula: solicitacao.esocial_matricula,
       credenciamento_data: solicitacao.credenciamento_data,
       chave_pix: solicitacao.chave_pix,
+      foto_rosto_path: solicitacao.foto_rosto_path,
     })
     .select("id")
     .single();
