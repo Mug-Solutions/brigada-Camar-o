@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { criarFetchComTimeout } from "./fetch-com-timeout";
 
 /**
  * Cliente Supabase vinculado à sessão do usuário logado (via cookies),
@@ -21,6 +22,7 @@ export async function getSessionSupabaseClient() {
   const cookieStore = await cookies();
 
   return createServerClient(url, anonKey, {
+    global: { fetch: criarFetchComTimeout() },
     cookies: {
       getAll() {
         return cookieStore.getAll();

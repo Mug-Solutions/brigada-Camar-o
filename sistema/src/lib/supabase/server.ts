@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { criarFetchComTimeout } from "./fetch-com-timeout";
 
 /**
  * Cliente Supabase para uso exclusivo no servidor (Server Components e
@@ -20,6 +21,7 @@ export function getServerSupabaseClient(): SupabaseClient | null {
 
   return createClient(url, serviceRoleKey, {
     auth: { persistSession: false },
+    global: { fetch: criarFetchComTimeout() },
   });
 }
 
