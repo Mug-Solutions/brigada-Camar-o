@@ -40,7 +40,12 @@ export default async function PortalMeusDadosPage({ searchParams }: PageProps<"/
       const [{ data: disponibilidadesData }, { data: bombeiroData }, { data: turnosData }] = await Promise.all([
         supabase.from("disponibilidades").select("*").order("dia_semana", { ascending: true }),
         supabase.from("bombeiros").select("telefone, chave_pix").eq("id", sessao.usuario.bombeiro_id).maybeSingle(),
-        supabase.from("turnos_config").select("nome").eq("ativo", true).order("nome", { ascending: true }),
+        supabase
+          .from("turnos_config")
+          .select("nome")
+          .eq("ativo", true)
+          .order("ordem", { ascending: true })
+          .order("nome", { ascending: true }),
       ]);
       disponibilidades = (disponibilidadesData ?? []) as Disponibilidade[];
       bombeiro = bombeiroData ?? null;

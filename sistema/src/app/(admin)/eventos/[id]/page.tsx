@@ -84,6 +84,7 @@ export default async function EventoDetalhePage({ params, searchParams }: PagePr
       .from("turnos_config")
       .select("nome, hora_inicio, hora_fim, valor")
       .eq("ativo", true)
+      .order("ordem", { ascending: true })
       .order("nome", { ascending: true }),
     carregarDadosDocumento(supabase, id),
   ]);

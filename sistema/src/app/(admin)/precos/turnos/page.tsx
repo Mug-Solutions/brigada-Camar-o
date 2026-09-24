@@ -33,6 +33,7 @@ export default async function TurnosPage({ searchParams }: PageProps<"/precos/tu
     const { data } = await supabase
       .from("turnos_config")
       .select("nome, hora_inicio, hora_fim, valor, ativo")
+      .order("ordem", { ascending: true })
       .order("nome", { ascending: true });
     turnos = (data ?? []) as TurnoConfig[];
   }
